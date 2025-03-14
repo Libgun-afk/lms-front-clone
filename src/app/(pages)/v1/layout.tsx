@@ -3,7 +3,7 @@
 import SideBar from "./sidebar";
 import Link from "next/link";
 
-export default function DashboardLayout({children }: any) {
+export default function DashboardLayout({ children, }: Readonly<{ children: React.ReactNode; }>) {
 
     return (
         <div className="account-page">

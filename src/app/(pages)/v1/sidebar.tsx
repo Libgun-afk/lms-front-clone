@@ -17,7 +17,7 @@ const SideBar = () => {
     const router = usePathname();
     const [sidebarShrink, setSidebarShrink] = useAtom(sidebarShrinkAtom);
 
-    const isActive = (path: any) => {
+    const isActive = (path: string) => {
         if (path === router) return true;
         if (path !== "/" && router.startsWith(path)) return true;
         return false;

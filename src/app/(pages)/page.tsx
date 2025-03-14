@@ -1,22 +1,26 @@
 'use client';
 
 import Image from "next/image";
-import { Button, Form, FormProps, Input, Radio } from 'antd';
+import { Form, FormProps, Input } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import { useAtom } from "jotai/react";
 import { userDataAtom, userTokenAtom } from "@/components/Provider";
 import { useRouter } from "next/navigation";
 import { setCookie } from 'cookies-next';
 
+interface LoginType {
+    username: string;
+    password: string;
+}
+
 const LoginPage = () => {
     const router = useRouter();
     const [form] = Form.useForm();
-    const [userToken, setUserToken] = useAtom(userTokenAtom);
-    const [userData, setUserData] = useAtom(userDataAtom);
+    const [, setUserToken] = useAtom(userTokenAtom);
+    const [, setUserData] = useAtom(userDataAtom);
     
-    const onFinish: FormProps<any>['onFinish'] = (values) => {
+    const onFinish: FormProps<LoginType | null>['onFinish'] = (values) => {
         const testToken =  Math.random().toString(36).substring(2, 10);
-    
         setUserToken(testToken);
         setUserData(values);
         setCookie('userToken', testToken);

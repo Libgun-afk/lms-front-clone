@@ -1,10 +1,21 @@
 'use client'
 
-import { Space, Table, TableProps, Tag } from "antd";
+import { Table, TableProps, Tag } from "antd";
+
+interface DataType {
+    key: string;
+    id: number;
+    phone: string;
+    onoo: number;
+    last_use: number;
+    created: string;
+    last_login: string;
+    status: boolean;
+}
 
 const Product = () => {
 
-    const columns: TableProps<any>['columns'] = [
+    const columns: TableProps<DataType>['columns'] = [
         {
             title: 'ID',
             dataIndex: 'id',
@@ -45,7 +56,7 @@ const Product = () => {
         },
     ];
       
-    const data: any[] = [
+    const data: DataType[] = [
         {
             key: '1',
             id: 1111,
@@ -86,7 +97,7 @@ const Product = () => {
                     <p className="desc">Нийт: <span>3</span></p>
                 </div>
                 <div className="box-body">
-                    <Table<any> columns={columns} dataSource={data} />
+                    <Table<DataType> columns={columns} dataSource={data} />
                 </div>
             </div>
         </div>
