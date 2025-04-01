@@ -1,13 +1,7 @@
-'use client'
+"use client";
 
-const Dashboard = () => {
- 
+const Users = () => {
+  return <div className="dashboard-page">users Page</div>;
+};
 
-    return(
-        <div className="dashboard-page">
-            users Page
-        </div>
-    )
-}
-
-export default Dashboard;
+export default Users;

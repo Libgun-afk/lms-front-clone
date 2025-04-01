@@ -1,18 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Table, Button, Tag, Checkbox } from "antd";
+import { Table, Tag, Image, Checkbox } from "antd";
 import type { TableProps } from "antd";
-import { IoAddOutline } from "react-icons/io5";
-
-interface Location {
-  city: string;
-  district: string;
-  khoroo: string;
-  address: string;
-  latitude: string;
-  longitude: string;
-}
+import { IoAddOutline, IoCloseOutline } from "react-icons/io5";
+import { FaFilter } from "react-icons/fa";
 
 interface Features {
   isOpen24Hours: boolean;
@@ -22,8 +14,17 @@ interface Features {
   hasPowerBankRental: boolean;
 }
 
+interface Location {
+  city: string;
+  district: string;
+  khoroo: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+}
+
 interface Branch {
-  id: number;
+  id: string;
   name: string;
   status: string;
   imageUrl: string;
@@ -31,6 +32,7 @@ interface Branch {
   weekendHours: string;
   features: Features;
   location: Location;
+  createdAt: string;
 }
 
 interface BranchListProps {
@@ -40,170 +42,159 @@ interface BranchListProps {
 const BranchList = ({ branches }: BranchListProps) => {
   const [filter, setFilter] = useState("");
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [selectedType, setSelectedType] = useState<string[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
-  const [selectedRegion, setSelectedRegion] = useState<string[]>([]);
+  const [isFilterVisible, setIsFilterVisible] = useState<boolean>(true);
 
+  // 🔄 Шүүлтүүрийн toggle функц
+  const toggleFilter = () => setIsFilterVisible((prev) => !prev);
+
+  // 🔍 Шүүлтүүр
   const filteredBranches = branches.filter((branch) => {
-    const typeMatch =
-      selectedType.length === 0 ||
-      selectedType.includes(branch.location.district);
     const statusMatch =
       selectedStatus.length === 0 || selectedStatus.includes(branch.status);
-    const regionMatch =
-      selectedRegion.length === 0 ||
-      selectedRegion.includes(branch.location.city);
     const nameMatch = branch.name.toLowerCase().includes(filter.toLowerCase());
 
-    return typeMatch && statusMatch && regionMatch && nameMatch;
+    return statusMatch && nameMatch;
   });
 
+  // ✅ Row сонголт
   const rowSelection = {
     selectedRowKeys,
-    onChange: (selectedRowKeys: React.Key[], selectedRows: Branch[]) => {
-      setSelectedRowKeys(selectedRowKeys);
-    },
-    getCheckboxProps: (record: Branch) => ({
-      disabled: record.status === "sda",
-    }),
+    onChange: (keys: React.Key[]) => setSelectedRowKeys(keys),
   };
 
+  // 📋 Хүснэгтийн багана
   const columns: TableProps<Branch>["columns"] = [
     {
-      title: "Утасны дугаар",
-      dataIndex: "phone",
-      key: "phone",
-      render: (phone) => <span className="">{phone}</span>,
-    },
-    {
-      title: "Код",
-      dataIndex: "code",
-      key: "code",
-      render: (code) => <span className="">{code}</span>,
-    },
-    {
-      title: "Дэлгүүрийн нэр",
-      dataIndex: "name",
-      key: "name",
-      render: (name) => <span className="">{name}</span>,
-    },
-    {
-      title: "Бүс",
-      dataIndex: ["location", "city"],
-      key: "city",
-      render: (city) => <span className="">{city}</span>,
-    },
-    {
-      title: "Дэлгүүрийн төрөл",
-      dataIndex: ["", ""],
-      key: "district",
-      render: (district) => <span className="">{district}</span>,
-    },
-
-    {
-      title: "  Түрээс эсэх",
-      dataIndex: ["true", "false"],
-      key: "rent",
-      render: (status) => (
-        <Tag color={status === "Тийм" ? "green" : "gray"}>
-          {status === "ACTIVE" ? "Тийм" : "Үгүй"}
-        </Tag>
+      title: "Зураг",
+      dataIndex: "imageUrl",
+      key: "imageUrl",
+      render: (imageUrl) => (
+        <Image
+          src={imageUrl}
+          alt="Branch Image"
+          width={50}
+          height={50}
+          className="rounded-lg"
+        />
       ),
     },
     {
-      title: "Сүүлд өөрчилсөн",
-      dataIndex: ["true", "false"],
-      key: "rent",
-      render: (district) => <span className="">{district}</span>,
+      title: "Нэр",
+      dataIndex: "name",
+      key: "name",
+      render: (name) => <span>{name}</span>,
+    },
+    {
+      title: "Хаяг",
+      dataIndex: ["location", "address"],
+      key: "address",
+      render: (address) => <span>{address}</span>,
+    },
+    {
+      title: "Цагийн хуваарь",
+      dataIndex: "weekdaysHours",
+      key: "weekdaysHours",
+      render: (weekdaysHours) => <span>{weekdaysHours}</span>,
+    },
+    {
+      title: "Үйлчилгээ",
+      dataIndex: "features",
+      key: "features",
+      render: (features) => <span></span>,
+    },
+    {
+      title: "Бүртгэгдсэн огноо",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (createdAt) => (
+        <span>{new Date(createdAt).toLocaleDateString()}</span>
+      ),
     },
     {
       title: "Төлөв",
       dataIndex: "status",
       key: "status",
       render: (status) => (
-        <Tag color={status === "ACTIVE" ? "green" : "gray"}>
-          {status === "ACTIVE" ? "Идэвхтэй" : "Хаасан"}
+        <Tag color={status === "ACTIVE" ? "green" : "red"}>
+          {status === "ACTIVE" ? "Идэвхтэй" : "Хаагдсан"}
         </Tag>
       ),
-    },
-    {
-      title: "Бүртгэсэн хэрэглэгч",
-      dataIndex: "user",
-      key: "user",
-      render: (user) => <span className="">{user}</span>,
     },
   ];
 
   return (
-    <div className="flex w-full gap-3">
-      <div className="w-72 p-4 border-r bg-gray-50 flex flex-col gap-4">
-        <h2 className="font-semibold">Шүүлтүүр</h2>
+    <div className="flex bg-black gap-3">
+      {/* {isFilterVisible && (
+        <div className="w-72 p-4 border-r bg-gray-50 flex flex-col gap-4 transition-all">
+          <div className="flex justify-between items-center">
+            <h2 className="font-semibold">Шүүлтүүр</h2>
+            <button
+              onClick={toggleFilter}
+              className="text-gray-500 hover:text-gray-700">
+              <IoCloseOutline className="w-5 h-5" />
+            </button>
+          </div>
 
-        {/* Төрөл */}
-        <div className="flex flex-col gap-2">
-          <h3 className="font-medium">Төрөл</h3>
-          <Checkbox.Group
-            className="flex flex-col gap-2"
-            options={["Супермаркет", "Хөрш", "Экспресс", "Агуулах"]}
-            onChange={(values) => setSelectedType(values as string[])}
-          />
+          <div className="flex flex-col gap-2">
+            <h3 className="font-medium">Төлөв</h3>
+            <Checkbox.Group
+              className="flex flex-col gap-2"
+              options={["ACTIVE", "INACTIVE"]}
+              onChange={(values) => setSelectedStatus(values as string[])}
+            />
+          </div>
         </div>
+      )} */}
 
-        {/* Бүс */}
-        <div className="flex flex-col gap-2">
-          <h3 className="font-medium">Бүс</h3>
-          <Checkbox.Group
-            className="flex flex-col gap-2"
-            options={["Баруун", "Зүүн", "Төв", "Орон нутаг"]}
-            onChange={(values) => setSelectedRegion(values as string[])}
-          />
-        </div>
-
-        {/* Тусгай зөвшөөрөл */}
-        <div className="flex flex-col gap-2">
-          <h3 className="font-medium">Тусгай зөвшөөрөл</h3>
-          <Checkbox.Group
-            className="flex flex-col gap-2"
-            options={["Идэвхтэй", "Дууссан"]}
-            onChange={(values) => setSelectedStatus(values as string[])}
-          />
-        </div>
-
-        <button className="gap-2 flex justify-center items-center bg-[#3051A0] text-white p-2 pl-1 rounded-xl">
-          <IoAddOutline className="w-[18px] h-[16px]" />
-          Шүүх
-        </button>
-      </div>
-
-      <div className="w-full">
-        {/* Хайлт */}
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex justify-center items-center gap-3">
+      <div className="w-full h-[36px] bg-red-200">
+        {/* <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-2">
             <div className="font-bold text-lg">Салбарын жагсаалт</div>
 
-            <div className="text-sm mt-1 text-[#A0AEC0] flex items-center gap-2">
-              Нийт :<div className="text-black">{filteredBranches.length}</div>
+            <div className="text-sm text-gray-500 flex gap-2">
+              Нийт:
+              <div className="text-sm text-black">
+                {filteredBranches.length}
+              </div>
             </div>
           </div>
-          <button className="gap-2 flex  items-center bg-[#3051A0] text-white px-4 py-2 rounded-xl">
-            <IoAddOutline className="w-[18px] h-[16px]" /> Салбар бүртгэх
-          </button>
-        </div>
 
-        {/* Хүснэгт */}
+          <div className="flex gap-2">
+            <input
+              type="search"
+              placeholder="Хайлт"
+              className="rounded-xl h-[36px] border-2 border-gray-300 p-2"
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            <button
+              onClick={toggleFilter}
+              className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl border-2 border-gray-300 justify-center items-center gap-2 p-2">
+              <FaFilter />
+              Шүүлт
+            </button>
+            <button className="gap-2 h-[36px] flex items-center bg-[#0A2D75] rounded-xl text-white hover:bg-white hover:text-[#0A2D75] px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
+              <IoAddOutline />
+              Салбар бүртгэх
+            </button>
+          </div>
+        </div> */}
+
         <Table
-          rowSelection={rowSelection}
           columns={columns}
           dataSource={filteredBranches.map((branch) => ({
             ...branch,
             key: branch.id,
           }))}
-          rowClassName={() => "group hover:bg-[#D1E9FF] transition-colors"}
           pagination={{
-            pageSize: 5,
+            pageSize: 10,
             showSizeChanger: true,
-            pageSizeOptions: ["5", "10", "20"],
+            pageSizeOptions: ["10", "20", "30"],
+            showTotal: (total) => `Нийт ${total} салбар`,
           }}
+          rowClassName={() =>
+            "hover:bg-blue-50 transition-colors h-[60px] hover:bg-[#D1E9FF] !important"
+          }
           rowKey="id"
         />
       </div>

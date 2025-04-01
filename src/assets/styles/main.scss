@@ -319,10 +319,10 @@ textarea {
 
 .account-page {
   display: flex;
-  flex-wrap: wrap;
   width: 100vw;
   height: 100vh;
   .account-sidebar {
+    // position: fixed;
     width: 220px;
     height: 100vh;
     background-color: var(--color-main);
@@ -347,8 +347,8 @@ textarea {
         a,
         .menu-shrink,
         .profile-menu {
-          .icon {
-          }
+          // .icon {
+          // }
           p {
             display: none;
           }
@@ -443,12 +443,12 @@ textarea {
     }
   }
   .account-main {
-    width: calc(100% - 220px);
+    width: calc(120% - 220px);
     display: flex;
     flex-direction: column;
     background-color: var(--color-body);
     .account-body {
-      height: calc(100% - 32px);
+      height: calc(120% - 32px);
       padding: 0px;
     }
     .account-footer {
