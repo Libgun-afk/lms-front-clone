@@ -1,9 +1,9 @@
-
 import "../assets/styles/main.scss";
 import Provider from "@/components/Provider";
-import { AntdRegistry } from '@ant-design/nextjs-registry';
 
-export default function RootLayout({ children, }: Readonly<{ children: React.ReactNode; }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <head>
@@ -13,11 +13,9 @@ export default function RootLayout({ children, }: Readonly<{ children: React.Rea
         <meta name="description" content="Back Office Template - Blue Print" />
       </head>
       <body>
-        <AntdRegistry>
-          <Provider>
-            <main>{children}</main>
-          </Provider>
-        </AntdRegistry>
+        <Provider>
+          <main>{children}</main>
+        </Provider>
       </body>
     </html>
   );

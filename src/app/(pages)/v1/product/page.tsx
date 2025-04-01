@@ -1,4 +1,4 @@
-import ProductList from "@/components/ProductList";
+import ProductList from "@/components/product/ProductList";
 import { GET_PRODUCTS } from "@/graphql/queries";
 import client from "@/lib/apollo-client";
 
@@ -19,7 +19,7 @@ export default async function ProductPage() {
   const products = await getProducts();
 
   return (
-    <div className="dashboard-page">
+    <div className="flex p-4">
       <ProductList products={products} />
     </div>
   );

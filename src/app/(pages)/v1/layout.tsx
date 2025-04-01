@@ -10,18 +10,18 @@ export default function DashboardLayout({
     <div className="account-page">
       <SideBar />
       <div className="account-main">
-        <div className="account-body">{children}</div>
         <div className="account-footer">
           <ul>
             <li>
               <p>Нүүр хуудас</p>
             </li>
             <li>
-              <Link href="#">Хэрэглэгчийн жагсаалт</Link>
+              <Link href="#">Бараа материал</Link>
             </li>
           </ul>
           <p>Back-Office System v0.0.3 | © Blueprint LLC 2025</p>
         </div>
+        <div className="account-body">{children}</div>
       </div>
     </div>
   );
