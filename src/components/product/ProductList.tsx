@@ -1,12 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { Form, Input, Modal, Select, Space, Table, Tag } from "antd";
-import type { TableProps } from "antd";
-import { usePathname } from "next/navigation";
+import {
+  DatePicker,
+  Form,
+  Input,
+  message,
+  Modal,
+  Select,
+  Space,
+  Table,
+  Tag,
+  Upload,
+} from "antd";
+import type { TableProps, UploadProps } from "antd";
+// import { usePathname } from "next/navigation";
 import { CREATE_PRODUCT_MUTATION } from "@/graphql/mutation";
 import request from "graphql-request";
 import { Option } from "antd/es/mentions";
+import TextArea from "antd/es/input/TextArea";
+import Dragger from "antd/es/upload/Dragger";
+import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
+import { toast, Toaster } from "react-hot-toast";
 
 interface Tag {
   id: number;
@@ -82,6 +97,14 @@ const ProductList = ({ products }: ProductListProps) => {
     description: "",
   });
 
+  // options массивыг тохируулах
+  const options = products.map((product) => ({
+    label: `${product.name} (${product.code})`, // Харуулах текст
+    value: product.code, // Сонгогдсон утга
+  }));
+
+  const selectedValue = `${productData.name} (${productData.code})`;
+
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -95,6 +118,34 @@ const ProductList = ({ products }: ProductListProps) => {
     }));
   };
 
+  const { Dragger } = Upload;
+
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [fileList, setFileList] = useState<any[]>([]);
+
+  const handlePreview = (file: any) => {
+    setPreviewImage(file.url || URL.createObjectURL(file.originFileObj));
+    setPreviewVisible(true);
+  };
+
+  const handleDelete = (file: any) => {
+    setFileList(fileList.filter((item) => item.uid !== file.uid));
+  };
+
+  const props = {
+    name: "file",
+    multiple: false,
+    fileList,
+    onChange(info: any) {
+      let newFileList = [...info.fileList];
+      setFileList(newFileList);
+    },
+    beforeUpload() {
+      return false; // Disable auto upload
+    },
+  };
+
   const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const tagsArray = value.split(",").map((tag) => parseInt(tag.trim(), 10));
@@ -104,33 +155,30 @@ const ProductList = ({ products }: ProductListProps) => {
     }));
   };
 
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+
+  const handleStartDateChange = (date: any, dateString: string) => {
+    setStartDate(date ? new Date(dateString) : null);
+  };
+
+  const handleEndDateChange = (date: any, dateString: string) => {
+    setEndDate(date ? new Date(dateString) : null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!productData.name.trim()) {
-      alert("Product name is required.");
-      return;
-    }
-    if (productData.price <= 0) {
-      alert("Price must be greater than 0.");
-      return;
-    }
-    if (productData.weight <= 0) {
-      alert("Weight must be greater than 0.");
-      return;
-    }
-    if (productData.remaining < 0) {
-      alert("Remaining quantity cannot be negative.");
+      toast.error("Бүтээгдэхүүний нэрийг оруул");
       return;
     }
 
     const result = await createProduct(productData);
     if (result) {
-      alert("Product successfully created!");
+      toast.success(" Барааны мэдээлэл амжилттай бүртгэгдлээ.");
     }
   };
-
-  const router = usePathname();
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -142,12 +190,6 @@ const ProductList = ({ products }: ProductListProps) => {
     setIsModalVisible(false);
   };
 
-  const isActive = (path: string) => {
-    if (path === router) return true;
-    if (path !== "/" && router.startsWith(path)) return true;
-    return false;
-  };
-
   const [filter, setFilter] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
@@ -157,7 +199,7 @@ const ProductList = ({ products }: ProductListProps) => {
   const toggleFilter = () => setIsFilterVisible((prev) => !prev);
   const toggleDetail = () => setIsDetailsVisible((prev) => !prev);
 
-  const [activeTab, setActiveTab] = useState<"product" | "supply">("product");
+  // const [activeTab, setActiveTab] = useState<"product" | "supply">("product");
 
   const filteredProducts = products.filter((product) => {
     const tagMatch =
@@ -287,7 +329,7 @@ const ProductList = ({ products }: ProductListProps) => {
       )} */}
 
       <div className="flex flex-col gap-4 w-full rounded-xl bg-white">
-        <div className="flex justify-between  h-[60px] items-center border-b border-gray-200 px-2">
+        <div className="flex justify-between  h-[60px] items-center border-b border-gray-200 px-4">
           <div className="flex gap-6 items-center justify-center">
             <div className="font-bold text-lg">Бараа материалын жагсаалт</div>
             <div className="flex gap-2 text-sm text-gray-500">
@@ -348,7 +390,7 @@ const ProductList = ({ products }: ProductListProps) => {
         className={`fixed top-0 left-0 right-0 bottom-0 z-50 flex justify-center items-center bg-black bg-opacity-50 transition-all ${
           isModalVisible ? "opacity-100 visible" : "opacity-0 invisible"
         }`}>
-        <div className="bg-white rounded-xl w-[600px] h-[660px]">
+        <div className="bg-white rounded-xl w-[600px] h-[700px]">
           <div className="flex justify-between items-center px-5 py-5 rounded-t-xl bg-[#F0F2F5] ">
             <h2 className="text-xl font-medium text-[#4B5563]">
               Бараа бүртгэх
@@ -374,43 +416,115 @@ const ProductList = ({ products }: ProductListProps) => {
 
           <form className="flex flex-col p-5 gap-5">
             <div className="grid grid-cols-2 gap-4">
-              <input
-                type="text"
-                name="code"
-                value={productData.code}
-                onChange={handleInputChange}
-                placeholder="Product Code"
-                className="p-2 border rounded w-full"
-              />
-              <input
-                type="text"
-                name="name"
-                value={productData.name}
-                onChange={handleInputChange}
-                placeholder="Product Name"
-                className="p-2 border rounded w-full"
-              />
+              <div className="flex flex-col gap-1">
+                <div className="text-sm text-[#374151] pl-1">Барааны код</div>
+                <Input
+                  type="text"
+                  name="code"
+                  value={productData.code}
+                  onChange={handleInputChange}
+                  placeholder="Барааны код"
+                  className="p-2 border rounded w-full"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <div className="text-sm text-[#374151] pl-1">Төрөл</div>
+                <Input
+                  type="text"
+                  name="type"
+                  value={productData.name} // type solih
+                  onChange={handleInputChange}
+                  placeholder="Төрөл"
+                  className="p-2 border rounded w-full"
+                />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <input
+              <div className="flex flex-col gap-1">
+                <div className="text-sm text-[#374151] pl-1">Барааны нэр</div>
+                <Input
+                  type="text"
+                  name="name"
+                  value={productData.name}
+                  onChange={handleInputChange}
+                  placeholder="Мандарин JEJU"
+                  className="p-2 border rounded w-full"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <div className="text-sm text-[#374151] pl-1">
+                  Дагалдах бараа, бэлэгний код
+                </div>
+                <Select
+                  showSearch
+                  placeholder="Барааны код сонгох"
+                  options={options}
+                  value={selectedValue} // Сонгогдсон утга
+                  onChange={(value) => {
+                    const selectedProduct = products.find(
+                      (product) => product.code === value
+                    );
+
+                    if (selectedProduct) {
+                      handleInputChange({
+                        target: {
+                          name: "code",
+                          value: selectedProduct.code,
+                        },
+                      } as React.ChangeEvent<HTMLInputElement>);
+                    } else {
+                      console.warn("Selected product not found!");
+                    }
+                  }}
+                  className="p-2 border rounded bg-red-200 h-24"
+                />
+              </div>
+
+              {/* <input
                 type="text"
                 name="price"
                 value={productData.price}
                 onChange={handleInputChange}
                 placeholder="Product Price"
                 className="p-2 border rounded w-full"
-              />
-              <input
+              /> */}
+              {/* <input
                 type="text"
                 name="weightUnit"
                 value={productData.weightUnit}
                 onChange={handleInputChange}
                 placeholder="Weight Unit"
                 className="p-2 border rounded w-full"
-              />
+              /> */}
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <input
+              <div className="flex gap-4">
+                <div>
+                  <div className="text-sm text-[#374151] pl-1">
+                    Хямдрал эхлэх
+                  </div>
+                  <DatePicker
+                    // value={startDate ? moment(startDate) : null}
+                    // onChange={handleStartDateChange}
+                    format="YYYY-MM-DD"
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <div className="text-sm text-[#374151] pl-1">
+                    Хямдрал дуусах
+                  </div>
+                  <DatePicker
+                    // value={endDate ? moment(endDate) : null}
+                    // onChange={handleEndDateChange}
+                    format="YYYY-MM-DD"
+                    className="w-full"
+                  />
+                </div>
+              </div>
+              <div></div>
+              {/* <input
                 type="text"
                 name="weight"
                 value={productData.weight}
@@ -425,28 +539,161 @@ const ProductList = ({ products }: ProductListProps) => {
                 onChange={handleInputChange}
                 placeholder="Remaining Quantity"
                 className="p-2 border rounded w-full"
+              /> */}
+            </div>
+            <div className="grid grid-cols-4 gap-4">
+              <div className="flex flex-col gap-1">
+                <div className="text-sm text-[#374151] pl-1">Үндсэн үнэ</div>
+                <Input
+                  type="text"
+                  name="price"
+                  value={productData.price}
+                  onChange={handleInputChange}
+                  placeholder="2,500 ₮"
+                  className="p-2 border rounded w-full"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <div className="text-sm text-[#374151] pl-1">Хямдарсан үнэ</div>
+                <Input
+                  type="text"
+                  name="price"
+                  value={productData.price}
+                  onChange={handleInputChange}
+                  placeholder="2,000 ₮"
+                  className="p-2 border rounded w-full"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <div className="text-sm text-[#374151] pl-1">
+                  Хямдралын хувь
+                </div>
+                <Input
+                  type="text"
+                  name="price"
+                  value={productData.price}
+                  onChange={handleInputChange}
+                  placeholder="20%"
+                  className="p-2 border rounded w-full"
+                />
+              </div>
+              <div></div>
+              {/* <input
+                type="text"
+                name="weight"
+                value={productData.weight}
+                onChange={handleInputChange}
+                placeholder="Product Weight"
+                className="p-2 border rounded w-full"
+              /> */}
+              {/* <input
+                type="text"
+                name="remaining"
+                value={productData.remaining}
+                onChange={handleInputChange}
+                placeholder="Remaining Quantity"
+                className="p-2 border rounded w-full"
+              /> */}
+            </div>
+            <div className="flex flex-col gap-1">
+              <div className="text-sm text-[#374151] pl-1">Тайлбар</div>
+              <TextArea
+                name="description"
+                value={productData.description}
+                onChange={handleInputChange}
+                placeholder="Орц, найруулга гэх мэт тайлбарласан дэлгэрэнгүй мэдээллийг энд бичнэ."
+                className="p-2 border rounded w-full max-h-[100px]"
               />
             </div>
-            <textarea
-              name="description"
-              value={productData.description}
-              onChange={handleInputChange}
-              placeholder="Product Description"
-              className="p-2 border rounded w-full min-h-[100px]"
-            />
-            <input
+            {/* <Dragger {...props} className="flex w-[268px]">
+              <div className="flex justify-center items-center pl-16 gap-5">
+                <div className="">
+                  <p className="text-sm text-[#3051A0]">Зураг оруулах</p>
+                  <p className="text-xs text-[#374151]">
+                    SVG, PNG, JPG <br /> (1600x1600px)
+                  </p>
+                </div>
+
+                <img src="/image copy 4.png" alt="" className="h-10 w-10" />
+              </div>
+            </Dragger> */}{" "}
+            <div className="flex w-full ">
+              <Dragger {...props} className="flex w-[268px] h-[84px]">
+                <div className="flex justify-center items-center pl-16 gap-5">
+                  <div className="text-center">
+                    <p className="text-sm text-[#3051A0]">Зураг оруулах</p>
+                    <p className="text-xs text-[#374151]">
+                      SVG, PNG, JPG (1600x1600px)
+                    </p>
+                  </div>
+                  <img
+                    src="/image copy 4.png"
+                    alt="upload icon"
+                    className="h-10 w-10"
+                  />
+                </div>
+              </Dragger>
+
+              <div className="flex gap-3 pt-12">
+                {fileList.map((file) => {
+                  const fileUrl =
+                    file.url ||
+                    (file.originFileObj
+                      ? URL.createObjectURL(file.originFileObj)
+                      : "");
+
+                  return (
+                    <div
+                      key={file.name || fileUrl}
+                      className="relative w-12 h-12 border rounded overflow-hidden">
+                      <img
+                        src={fileUrl}
+                        alt="Uploaded"
+                        className="w-full h-full object-cover cursor-pointer"
+                        onClick={() => handlePreview(file)}
+                      />
+                      <button
+                        className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+                        onClick={() => handleDelete(file)}>
+                        <DeleteOutlined />
+                      </button>
+                    </div>
+                  );
+                })}
+                <Toaster />
+              </div>
+
+              <Modal
+                open={previewVisible}
+                footer={null}
+                onCancel={() => setPreviewVisible(false)}
+                centered
+                className="flex items-center justify-center h-[800px] w-[800px]">
+                <img
+                  className=" object-contain rounded-lg  h-[700px] w-[800px]"
+                  src={previewImage || ""}
+                  alt="Preview"
+                />
+              </Modal>
+
+              {/* <input
               type="text"
               name="tags"
               value={productData.tags.join(", ")}
               onChange={handleTagsChange}
               placeholder="Tags (comma separated)"
               className="p-2 border rounded w-full"
-            />
-            <button
-              type="submit"
-              className="bg-blue-500 text-white p-3 rounded w-full hover:bg-blue-600 transition font-semibold">
-              Create Product
-            </button>
+            /> */}
+            </div>
+            <div className="flex justify-end items-center rounded-b-xl h-[68px] w-full">
+              <button
+                type="submit"
+                className="bg-[#0A2D75] text-white flex justify-center items-center rounded w-[102px] h-9 hover:bg- transition font-semibold gap-2">
+                <img src="/image copy 5.png" className="w-[14px] h-4" alt="" />
+                <div className="text-sm font-medium">Бүртгэх</div>
+              </button>
+            </div>
           </form>
         </div>
       </div>

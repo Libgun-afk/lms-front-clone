@@ -6,35 +6,18 @@ export const CREATE_PRODUCT_MUTATION = gql`
       id
       name
       status
-      price
-      tags {
-        id
-        name
-        status
-        products {
-          id
-          name
-          status
-          code
-          price
-          weight
-          weightUnit
-          remaining
-          description
-          minAge
-          createdUserId
-          createdAt
-          updatedUserId
-          updatedAt
-        }
-      }
-      weight
-      weightUnit
-      remaining
-      description
       code
-      createdAt
+      price
+      salePrice
+      salePercent
+      saleEnddate
+      description
       createdUserId
+      createdUserName
+      createdAt
+      updatedUserId
+      updatedUserName
+      updatedAt
     }
   }
 `;

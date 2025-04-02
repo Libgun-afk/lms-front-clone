@@ -26,22 +26,6 @@
 //     setCookie("userToken", testToken);
 //     router.push("/v1/dashboard");
 //   };
-//   // Define API_HOST with the appropriate value
-//   // const API_HOST = "https://hrms.go-bp.click";
-//   // const CLIENT_ID = "78deef1d-1370-49a1-8a46-7e131bbbee1a";
-//   // const REDIRECT_URI = "http://hrms.go-bp.click";
-
-//   // const onFinish: FormProps<LoginType | null>["onFinish"] = async (values) => {
-//   //   try {
-//   //     const authUrl = `${API_HOST}/api/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
-//   //       REDIRECT_URI
-//   //     )}&response_type=code&scope=read:users&state=api`;
-
-//   //     window.location.href = authUrl;
-//   //   } catch (error) {
-//   //     console.error("Login Error:", error);
-//   //   }
-//   // };
 
 //   return (
 //     <div className="auth-page">
@@ -158,8 +142,9 @@ interface LoginType {
 }
 
 const CLIENT_ID = "78deef1d-1370-49a1-8a46-7e131bbbee1a";
-const CLIENT_SECRET = "your-client-secret";
-const REDIRECT_URI = "http://localhost:3000";
+const CLIENT_SECRET =
+  "8d4a5621cc804f7979cf70d3e56195e54eccd224f6d98116733f2898d62f49c5";
+const REDIRECT_URI = "localhost:3000";
 const API_HOST = "https://hrms.go-bp.click";
 
 const LoginPage = () => {
@@ -178,7 +163,7 @@ const LoginPage = () => {
           clientId: CLIENT_ID,
           redirectUri: REDIRECT_URI,
           responseType: "code",
-          scope: "read:users",
+          scope: ["read:users"],
           state: "api",
           username: values.username,
           password: values.password,
@@ -197,11 +182,13 @@ const LoginPage = () => {
       const tokenResponse = await axios.post(
         `${API_HOST}/api/oauth/token`,
         {
-          client_id: CLIENT_ID,
-          client_secret: CLIENT_SECRET,
-          redirect_uri: REDIRECT_URI,
+          grantType: "authorization_code",
           code: authCode,
-          grant_type: "authorization_code",
+          clientId: CLIENT_ID,
+          clientSecret: CLIENT_SECRET,
+          refreshToken: "",
+          redirectUri: REDIRECT_URI,
+          // scope: ["read:users"],
         },
         {
           headers: {
@@ -212,13 +199,19 @@ const LoginPage = () => {
 
       console.log("Token Response:", tokenResponse.data);
 
-      const { access_token, user } = tokenResponse.data;
+      const { access_token, refresh_token, token_type, expires_in, scope } =
+        tokenResponse.data.result;
 
       setCookie("access_token", access_token);
-      setUserToken(access_token);
-      setUserData(user);
+      setCookie("refresh_token", refresh_token);
+      setCookie("token_type", token_type);
+      setCookie("expires_in", expires_in.toString());
+      setCookie("scope", scope);
 
-      router.push("/v1/dashboard");
+      setUserToken(access_token);
+      setUserData(tokenResponse.data.result);
+
+      router.push("/v1/controlpanel");
     } catch (error) {
       console.error("Login Error:", error);
 
@@ -227,6 +220,7 @@ const LoginPage = () => {
       }
     }
   };
+
   return (
     <div className="auth-page">
       <div className="auth-page_background">
@@ -234,54 +228,17 @@ const LoginPage = () => {
           <h1>Loyalty Management System</h1>
         </div>
         <div className="img">
-          <Image
-            src="/assets/images/auth1.png"
-            width={668}
-            height={795}
-            alt="LMS"
-            priority
-            className="img-1"
-          />
-          <Image
-            src="/assets/images/auth2.png"
-            width={668}
-            height={796}
-            alt="LMS"
-            priority
-            className="img-2"
-          />
-          <Image
-            src="/assets/images/auth3.png"
-            width={668}
-            height={795}
-            alt="LMS"
-            priority
-            className="img-3"
-          />
-          <Image
-            src="/assets/images/auth4.png"
-            width={669}
-            height={795}
-            alt="LMS"
-            priority
-            className="img-4"
-          />
-          <Image
-            src="/assets/images/auth5.png"
-            width={668}
-            height={612}
-            alt="LMS"
-            priority
-            className="img-5"
-          />
-          <Image
-            src="/assets/images/auth6.png"
-            width={468}
-            height={689}
-            alt="LMS"
-            priority
-            className="img-6"
-          />
+          {[...Array(6)].map((_, index) => (
+            <Image
+              key={index}
+              src={`/assets/images/auth${index + 1}.png`}
+              width={index === 5 ? 468 : 668}
+              height={[795, 796, 795, 795, 612, 689][index]}
+              alt="LMS"
+              priority
+              className={`img-${index + 1}`}
+            />
+          ))}
         </div>
       </div>
       <div className="auth-page_body">
