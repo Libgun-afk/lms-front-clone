@@ -50,15 +50,13 @@ export const GET_PRODUCTS = gql`
           name
           status
         }
-        weight
-        weightUnit
-        remaining
-        description
-        minAge
         createdUserId
         createdAt
         updatedUserId
         updatedAt
+        images {
+          url
+        }
       }
     }
   }
