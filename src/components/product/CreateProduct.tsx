@@ -7,10 +7,15 @@ import request from "graphql-request";
 import Tags from "./Tag";
 import { useAtomValue } from "jotai/react";
 import { userTokenAtom } from "../Provider";
-import { Form, Input, Select } from "antd";
+import { Form, Input, message, Select, Upload, UploadFile, UploadProps } from "antd";
 import Bonus from "./tags/Bonus";
 import Highlight from "./tags/Highlight";
 import Discounted from "./tags/Discounted";
+import { PlusOutlined } from "@ant-design/icons";
+import axios from "axios";
+import Dragger from "antd/es/upload/Dragger";
+
+const allowedFileTypes = ['image/png', 'image/jpeg', 'image/jpg'];
 
 const tagComponents: { [key: string]: React.ReactNode } = {
   Урамшуулалтай: <Bonus />,
@@ -77,9 +82,66 @@ const createProduct = async (productData: ProductData) => {
 
 const CreateProduct: React.FC<CreateProductProps> = ({ onClose, onRefresh }) => {
   const [form] = Form.useForm();
+  const token = useAtomValue(userTokenAtom);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [fileList, setFileList] = useState<any>([]);
+
+  const uploadProps = {
+    name: 'file',
+    multiple: true,
+    beforeUpload(file: any) {
+        if (!allowedFileTypes.includes(file.type)) {
+            message.error(`${file.name} зөвшөөрөгдөөгүй файл байна!`);
+            return Upload.LIST_IGNORE;
+        }
+        return true;
+    },
+    onChange(info: any) {
+        let newFileList = info.fileList.filter((file: any) => allowedFileTypes.includes(file.type));
+        setFileList(newFileList);
+    },
+    onRemove() {
+    },
+  };
 
   const handleSubmit = async (values: any) => {
+    if (!fileList.length) {
+      message.error('Файл заавал оруулах шаардлагатай!');
+      return;
+    }
+   
+    const imageUrls: string[] = [];
+    try {
+      const formData = new FormData();
+      formData.append('type', 'PRODUCT');
+    
+      fileList.forEach((item: any) => {
+        formData.append('files', item.originFileObj);
+      });
+    
+      const uploadURL = `${process.env.NEXT_PUBLIC_GRAPHQL_URI_UPLOAD}/api/file/upload`;
+    
+      const response = await axios.post(uploadURL, formData, {
+        headers: {
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImNsaWVudElkIjoiNzhkZWVmMWQtMTM3MC00OWExLThhNDYtN2UxMzFiYmJlZTFhIiwic2NvcGVzIjpbXSwicGVybWlzc2lvbnMiOltdLCJvcmdJZCI6MywiZW1wSWQiOjE0fQ.gcqaFkMvxgljmpboHhxBsyfVd28_RWrlSXltwGvR9Ug`, // Token-оо хамгаалж хадгалаарай
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    
+      if (response.status === 200) {
+        const urls = response.data || [response.data];
+        imageUrls.push(...urls);
+      } else {
+        message.error('Файл upload амжилтгүй боллоо.');
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      message.error('Файл upload хийх үед алдаа гарлаа!');
+    }
+  
+    console.log(imageUrls);
+    
     const formValue = {
       name: "",
       status: "",
@@ -222,7 +284,13 @@ const CreateProduct: React.FC<CreateProductProps> = ({ onClose, onRefresh }) => 
                 className="p-2 border rounded w-full"
               />
             </div>
-            {/* <ImageUploader onImageUpload={setImage} /> */}
+            <Form.Item label="Файл оруулах" required className="mb-4">
+              <Dragger {...uploadProps}>
+                  <p className="ant-upload-drag-icon">
+                  </p>
+                  <p className="ant-upload-text">ФАЙЛ ОРУУЛАХ</p>
+              </Dragger>
+            </Form.Item>
           </div>
 
           <div className="flex justify-end items-center border-t h-[64px] px-6 bg-[#F0F2F5] rounded-b-xl">
