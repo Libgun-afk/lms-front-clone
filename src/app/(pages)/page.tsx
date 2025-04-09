@@ -4,7 +4,11 @@ import Image from "next/image";
 import { Form, FormProps, Input, Checkbox, message } from "antd";
 import { MailOutlined, LockOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useAtom } from "jotai/react";
-import { userDataAtom, userRememberAtom, userTokenAtom } from "@/components/Provider";
+import {
+  userDataAtom,
+  userRememberAtom,
+  userTokenAtom,
+} from "@/components/Provider";
 import { useRouter } from "next/navigation";
 import { setCookie } from "cookies-next";
 import axios from "axios";
@@ -29,8 +33,8 @@ const LoginPage = () => {
   const onFinish = async (values: LoginType) => {
     setLoading(true);
 
-    if(values.remember === true){
-      setRememberData({username: values.username, password: values.password });
+    if (values.remember === true) {
+      setRememberData({ username: values.username, password: values.password });
     } else {
       setRememberData(null);
     }
@@ -40,47 +44,51 @@ const LoginPage = () => {
         clientId: "78deef1d-1370-49a1-8a46-7e131bbbee1a",
         redirectUri: "localhost:3000",
         responseType: "code",
-        scope: [
-          "read:users"
-        ],
+        scope: ["read:users"],
         state: "api",
         username: values.username,
-        password: values.password
-      }
+        password: values.password,
+      };
 
-      const resUserOauth = await axios.post(`${process.env.NEXT_PUBLIC_API_HOST}/api/oauth/authorize`, oauthVales);
-      if(resUserOauth.status === 201) {
+      const resUserOauth = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_HOST}/api/oauth/authorize`,
+        oauthVales
+      );
+      if (resUserOauth.status === 201) {
         const resultCode = resUserOauth.data.result;
         const tokanValues = {
           grantType: "authorization_code",
           code: resultCode,
           clientId: "78deef1d-1370-49a1-8a46-7e131bbbee1a",
-          clientSecret: "8d4a5621cc804f7979cf70d3e56195e54eccd224f6d98116733f2898d62f49c5",
+          clientSecret:
+            "8d4a5621cc804f7979cf70d3e56195e54eccd224f6d98116733f2898d62f49c5",
           refreshToken: "",
-          redirectUri: "localhost:3000"
-        }
+          redirectUri: "localhost:3000",
+        };
 
-        const resGetToken = await axios.post(`${process.env.NEXT_PUBLIC_API_HOST}/api/oauth/token`, tokanValues);
-        if(resGetToken.status === 201) {
-          const resultToken = resGetToken.data.result; 
-          setCookie('userToken', resultToken.access_token);
+        const resGetToken = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_HOST}/api/oauth/token`,
+          tokanValues
+        );
+        if (resGetToken.status === 201) {
+          const resultToken = resGetToken.data.result;
+          setCookie("userToken", resultToken.access_token);
           setUserToken(resultToken.access_token);
           setUserData(resultToken);
           setLoading(false);
-          router.push('/v1/product');
+          router.push("/v1/product");
         } else {
-          message.error('Хэрэглэгчийн нэвтрэх нэр нууц үг буруу байна');
+          message.error("Хэрэглэгчийн нэвтрэх нэр нууц үг буруу байна");
         }
-
       } else {
         setLoading(false);
-        message.error('Хэрэглэгчийн нэвтрэх нэр нууц үг буруу байна');
+        message.error("Хэрэглэгчийн нэвтрэх нэр нууц үг буруу байна");
       }
     } catch (error) {
       setLoading(false);
-      message.error('Алдаа гарлаа дахин оролдоно уу');
+      message.error("Алдаа гарлаа дахин оролдоно уу");
     }
-  }
+  };
 
   return (
     <div className="auth-page">
@@ -118,7 +126,16 @@ const LoginPage = () => {
           <p className="desc">Өөрийн мэдээллээ оруулна уу.</p>
 
           {!showForget ? (
-            <Form layout="vertical" form={form} onFinish={onFinish} autoComplete="off" initialValues={{ username: rememberData?.username, password: rememberData?.password, remember: true }}>
+            <Form
+              layout="vertical"
+              form={form}
+              onFinish={onFinish}
+              autoComplete="off"
+              initialValues={{
+                username: rememberData?.username,
+                password: rememberData?.password,
+                remember: true,
+              }}>
               <Form.Item
                 label="Нэвтрэх нэр"
                 name="username"
@@ -143,7 +160,7 @@ const LoginPage = () => {
                       name="remember"
                       className="h-6 w-6 rounded border-[#A0AEC0]"
                     />
-                    Нэвтрэх нэр сануул
+                    Нэвтрэх нэр сануулах
                   </label>
                 </Form.Item>
 
