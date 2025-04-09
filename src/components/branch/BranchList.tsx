@@ -283,7 +283,7 @@ function BranchList() {
             onClick={printDiv}
             className="h-[36px] gap-2 flex items-center justify-center bg-white rounded-xl border px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
             <img src="/image copy 8.png" alt="" className="w-[14px] h-4" />
-            Хэвлэх
+            Хэвлэхх
           </button>
 
           </div>

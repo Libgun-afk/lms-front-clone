@@ -93,15 +93,10 @@ export const GET_USERS = gql`
         }
       }
       detail {
-        lastName
         firstName
-        birthDate
-        email
-        gender
-        kyc
-        status
+        lastName
         phoneNumber
-        userId
+        email
       }
       status
       groups {

@@ -360,7 +360,7 @@ const UsersList = () => {
 
           <button className="gap-2 flex justify-center items-center bg-[#3051A0] text-white p-2 pl-1 rounded-xl">
             <IoAddOutline className="w-[18px] h-[16px]" />
-            Шүүх
+            Шүүхх
           </button>
         </div>
       )}

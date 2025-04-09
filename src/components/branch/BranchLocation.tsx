@@ -50,7 +50,7 @@ const LocationPage: React.FC = () => {
   const { loading, error, data } = useQuery(GET_BRANCHES);
 
   if (loading) return <Spin tip="Loading map..." />;
-  if (error) return <p>Error loading branches 😢</p>;
+  if (error) return <div>Error: {error.message}</div>;
 
   const branches = data?.getBranches?.items || [];
 

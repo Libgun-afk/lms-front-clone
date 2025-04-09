@@ -16,7 +16,6 @@ async function getBranches() {
 }
 
 export default async function BranchPage() {
-  // const branches = await getBranches();
 
   return (
     <div >

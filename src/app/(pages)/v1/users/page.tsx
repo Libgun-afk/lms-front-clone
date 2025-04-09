@@ -4,7 +4,7 @@ export default async function UsersPage() {
 
   return (
     <div >
-      <UsersList />
+      <UsersList/>
     </div>
   );
 }
