@@ -11,6 +11,8 @@ interface UserData {
 
 export const userTokenAtom = atomWithStorage<string | null>("userToken", null);
 export const userDataAtom = atomWithStorage<UserData | null>("userData", null);
+export const userRememberAtom = atomWithStorage<UserData | null>("userRemember", null);
+
 export const sidebarShrinkAtom = atomWithStorage<boolean>(
   "sidebarShrink",
   false
