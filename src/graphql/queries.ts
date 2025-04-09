@@ -43,6 +43,7 @@ export const GET_PRODUCTS = gql`
         id
         name
         status
+        description
         code
         price
         tags {

@@ -11,6 +11,7 @@ import ProductIcon from "@/assets/icons/product.svg";
 import PeopleIcon from "@/assets/icons/people.svg";
 import BranchIcon from "@/assets/icons/branch.svg";
 import DiscountIcon from "@/assets/icons/discount.svg";
+
 import ArrowLefticon from "@/assets/icons/arrow-left.svg";
 
 const SideBar = () => {
@@ -87,6 +88,7 @@ const SideBar = () => {
             <div className="icon">
               <DiscountIcon />
             </div>
+
             <p>Тайлан</p>
           </Link>
         </li>
@@ -102,12 +104,22 @@ const SideBar = () => {
         </li>
         <li>
           <Link
-            href="/v1/settings"
+            href="/v1/notification"
             className={`menu-item ${isActive("/v1/settings") ? "active" : ""}`}>
             <div className="icon">
               <DiscountIcon />
             </div>
-            <p>Тохиргоо</p>
+            <p>Мэдэгдэл</p>
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/v1/notification"
+            className={`menu-item ${isActive("/v1/settings") ? "active" : ""}`}>
+            <div className="icon">
+              <DiscountIcon />
+            </div>
+            <p>Log</p>
           </Link>
         </li>
       </ul>
