@@ -1,26 +1,67 @@
+"use client";
+
 import ProductList from "@/components/product/ProductList";
 import { GET_PRODUCTS } from "@/graphql/queries";
-import client from "@/lib/apollo-client";
+import { useQuery } from "@apollo/client";
+import { useEffect, useState } from "react";
+import { LoadingOutlined } from "@ant-design/icons";
+import { Flex, Spin } from "antd";
 
-async function getProducts() {
-  try {
-    const { data } = await client.query({
-      query: GET_PRODUCTS,
-    });
+const ProductPage = () => {
+  const { data, loading, error, refetch } = useQuery(GET_PRODUCTS);
+  const [products, setProducts] = useState([]);
+  const [refreshLoading, setRefreshLoading] = useState(false);
 
-    return data?.getProducts?.items || [];
-  } catch (error) {
-    console.error("Failed to fetch products:", (error as Error).message);
-    return [];
+  useEffect(() => {
+    if (data?.getProducts?.items) {
+      setProducts(data.getProducts.items);
+    }
+  }, [data]);
+
+  const handleRefresh = async () => {
+    try {
+      setRefreshLoading(true);
+      const result = await refetch();
+      if (result?.data?.getProducts?.items) {
+        setProducts(result.data.getProducts.items);
+      }
+    } catch (err) {
+      console.error("Refresh error:", err);
+    } finally {
+      setRefreshLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center pt-96">
+        <Spin
+          className="flex justify-center items-center"
+          indicator={<LoadingOutlined style={{ fontSize: 50 }} spin />}
+        />
+      </div>
+    );
   }
-}
 
-export default async function ProductPage() {
-  const products = await getProducts();
+  if (error) {
+    return (
+      <p className="flex justify-center items-center text-red-500">
+        Error: {error.message}
+      </p>
+    );
+  }
 
   return (
-    <div className="flex p-4">
-      <ProductList products={products} />
+    <div className="flex p-4 w-full">
+      {refreshLoading ? (
+        <div className="w-full flex justify-center pt-96">
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 50 }} spin />} />
+        </div>
+      ) : (
+        <ProductList products={products} onRefresh={handleRefresh} />
+      )}
     </div>
   );
-}
+};
+
+export default ProductPage;

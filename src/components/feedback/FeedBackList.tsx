@@ -2,319 +2,438 @@
 
 import { useState } from "react";
 import { Table, Tag } from "antd";
-import type { TableProps } from "antd";
-import { usePathname } from "next/navigation";
-import { CREATE_PRODUCT_MUTATION } from "@/graphql/mutation";
-import request from "graphql-request";
 
-interface Tag {
-  id: number;
-  name: string;
-  status: string;
-}
+const feedbacks = [
+  {
+    id: "1",
+    image: "/image copy 6.png",
+    name: "Асуудал 1",
+    type: "Санал",
+    description: "Системийн гадаад холбоосууд ажиллахгүй байна.",
+    createdAt: "2025-04-04T08:00:00Z",
+    user: "Төмөр",
+    priority: "Яаралтай",
+    status: "Шийдвэрлэсэн",
+    responsible: "Э.Цэцэг",
+    resolvedAt: "2025-04-05T10:00:00Z",
+  },
+  {
+    id: "2",
+    image: "/image copy 6.png",
+    name: "Асуудал 2",
+    type: "Гомдол",
+    description: "Бүтээгдэхүүний зураг алдаатай.",
+    createdAt: "2025-04-03T10:00:00Z",
+    user: "Жаргал",
+    priority: "Энгийн",
+    status: "Шийдвэрлэх",
+    responsible: "Х.Даваа",
+    resolvedAt: "2025-05-05T10:00:00Z",
+  },
+  {
+    id: "3",
+    image: "/image copy 6.png",
+    name: "Асуудал 3",
+    type: "Санал",
+    description: "Бүтээгдэхүүний зураг алдаатай.",
+    createdAt: "2025-04-03T10:00:00Z",
+    user: "Жаргал",
+    priority: "Энгийн",
+    status: "Хүлээгдэж байгаа",
+    responsible: "Х.Даваа",
+    resolvedAt: "2025-04-11T10:00:00Z",
+  },
+  {
+    id: "4",
+    image: "/image copy 6.png",
+    name: "Асуудал 3",
+    type: "Санал",
+    description: "Бүтээгдэхүүний зураг алдаатай.",
+    createdAt: "2025-04-03T10:00:00Z",
+    user: "Жаргал",
+    priority: "Энгийн",
+    status: "Хүлээгдэж байгаа",
+    responsible: "Х.Даваа",
+    resolvedAt: "2025-04-11T10:00:00Z",
+  },
+  {
+    id: "7",
+    image: "/image copy 6.png",
+    name: "Асуудал 2",
+    type: "Гомдол",
+    description: "Бүтээгдэхүүний зураг алдаатай.",
+    createdAt: "2025-04-03T10:00:00Z",
+    user: "Жаргал",
+    priority: "Энгийн",
+    status: "Шийдвэрлэх",
+    responsible: "Х.Даваа",
+    resolvedAt: "2025-05-05T10:00:00Z",
+  },
+  {
+    id: "5",
+    image: "/image copy 6.png",
+    name: "Асуудал 3",
+    type: "Санал",
+    description: "Бүтээгдэхүүний зураг алдаатай.",
+    createdAt: "2025-04-03T10:00:00Z",
+    user: "Жаргал",
+    priority: "Энгийн",
+    status: "Хүлээгдэж байгаа",
+    responsible: "Х.Даваа",
+    resolvedAt: "2025-04-11T10:00:00Z",
+  },
+  {
+    id: "6",
+    image: "/image copy 6.png",
+    name: "Асуудал 3",
+    type: "Санал",
+    description: "Бүтээгдэхүүний зураг алдаатай.",
+    createdAt: "2025-04-03T10:00:00Z",
+    user: "Жаргал",
+    priority: "Энгийн",
+    status: "Хүлээгдэж байгаа",
+    responsible: "Х.Даваа",
+    resolvedAt: "2025-04-11T10:00:00Z",
+  },
+];
 
-interface Product {
+interface Feedback {
   id: string;
+  image: string;
   name: string;
-  status: string;
-  code: string;
-  price: number;
-  tags: Tag[];
-  weight: number;
-  weightUnit: string;
-  remaining: number;
+  type: string;
   description: string;
-  minAge: number;
-  createdUserId: string;
   createdAt: string;
-  updatedUserId: string;
-  updatedAt: string;
+  user: string;
+  priority: string;
+  status: string;
+  responsible: string;
+  resolvedAt: string | null;
 }
 
-interface ProductListProps {
-  products: Product[];
+interface FeedbackListProps {
+  feedbacks: Feedback[];
 }
 
-interface ProductData {
-  name: string;
-  price: number;
-  tags: number[];
-  weight: number;
-  weightUnit: string;
-  remaining: number;
-  description: string;
-  code: string;
-}
+const FeedBackList = ({ feedbacks }: FeedbackListProps) => {
+  const [isDetailsVisible, setIsDetailsVisible] = useState<boolean>(false);
+  const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(
+    null
+  );
 
-const createProduct = async (productData: ProductData) => {
-  const endpoint =
-    "http://loadbalancerlmscore-1401289988.ap-east-1.elb.amazonaws.com/backoffice";
-  const token =
-    "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoibnlhbWRvcmptYWlsQGdtYWlsLmNvbSIsInJvbGVzIjpbInByb2R1Y3QiLCJ0YWciLCJ1c2VyIl19.awN_PCBKrw-0rLDlL1EpjMY8OuD8crZD2h-x6gEGcek";
-
-  try {
-    const response = await request<{ createProduct: ProductData }>(
-      endpoint,
-      CREATE_PRODUCT_MUTATION,
-      { createProductInput: productData },
-      { Authorization: ` ${token}` }
-    );
-    console.log("Бүтээгдэхүүн амжилттай үүслээ:", response.createProduct);
-    return response.createProduct;
-  } catch (error) {
-    console.error("Бүтээгдэхүүн үүсгэхэд алдаа гарлаа:", error);
-    if (error instanceof Error && (error as any).response) {
-      console.error("GraphQL Error Response:", (error as any).response.errors);
+  const handleRowClick = (feedback: Feedback) => {
+    if (selectedFeedback?.id === feedback.id) {
+      // If same feedback is clicked again, toggle off
+      setSelectedFeedback(null);
+      setIsDetailsVisible(false);
+    } else {
+      setSelectedFeedback(feedback);
+      setIsDetailsVisible(true);
     }
-  }
-};
-
-const FeedBackList = ({ products }: ProductListProps) => {
-  const [productData, setProductData] = useState<ProductData>({
-    code: "",
-    name: "",
-    price: 0,
-    tags: [],
-    weight: 0,
-    weightUnit: "",
-    remaining: 0,
-    description: "",
-  });
-
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setProductData((prev) => ({
-      ...prev,
-      [name]:
-        name === "weight" || name === "remaining" ? parseFloat(value) : value,
-    }));
   };
 
-  const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const tagsArray = value.split(",").map((tag) => parseInt(tag.trim(), 10));
-    setProductData((prev) => ({
-      ...prev,
-      tags: tagsArray,
-    }));
+  const onRefresh = () => {
+    console.log("Refreshing...");
   };
 
-  const router = usePathname();
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const isActive = (path: string) => {
-    if (path === router) return true;
-    if (path !== "/" && router.startsWith(path)) return true;
-    return false;
-  };
-
-  const [filter, setFilter] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
-  const [isFilterVisible, setIsFilterVisible] = useState<boolean>(true);
-  const [isDetailsVisible, setIsDetailsVisible] = useState<boolean>(true);
-
-  const toggleFilter = () => setIsFilterVisible((prev) => !prev);
-  const toggleDetail = () => setIsDetailsVisible((prev) => !prev);
-
-  const filteredProducts = products.filter((product) => {
-    const tagMatch =
-      selectedTags.length === 0 ||
-      product.tags.some((tag) => selectedTags.includes(tag.name));
-    const statusMatch =
-      selectedStatus.length === 0 || selectedStatus.includes(product.status);
-    const nameMatch = product.name.toLowerCase().includes(filter.toLowerCase());
-
-    return tagMatch && statusMatch && nameMatch;
-  });
-
-  // 📋 Хүснэгтийн багана
-  const columns: TableProps<Product>["columns"] = [
-    {
-      title: "Барааны код",
-      dataIndex: "code",
-      key: "code",
-      render: (code) => <span>{code}</span>,
-      width: 120,
-    },
+  const columns = [
     {
       title: "Зураг",
       dataIndex: "image",
-      key: "code",
-      render: (code) => <span>{code}</span>,
+      key: "image",
+      render: (image: string) => <img src={image} alt="feedback" width={50} />,
       width: 120,
     },
     {
-      title: "Барааны нэр",
+      title: "Гарчиг",
       dataIndex: "name",
       key: "name",
-      render: (name) => <span>{name}</span>,
+      render: (name: string) => <span>{name}</span>,
       width: 180,
     },
     {
-      title: "Дагалдах бэлэг",
-      dataIndex: "e",
-      key: "e",
-      render: (price) => <span>{price}</span>,
+      title: "Төрөл",
+      dataIndex: "type",
+      key: "type",
+      render: (type: string) => {
+        let typeTextColor = "";
+        let typeBgColor = "";
+
+        if (type === "Санал") {
+          typeTextColor = "#4CAF50";
+          typeBgColor = "#E8F5E9";
+        } else if (type === "Гомдол") {
+          typeTextColor = "#374151";
+          typeBgColor = "#F0F2F5";
+        }
+
+        return (
+          <span
+            style={{
+              color: typeTextColor,
+              backgroundColor: typeBgColor,
+              padding: "4px 8px",
+              borderRadius: "8px",
+            }}>
+            {type}
+          </span>
+        );
+      },
       width: 120,
     },
     {
-      title: "Тайлбар",
+      title: "Дэлгэрэнгүй",
       dataIndex: "description",
       key: "description",
-      render: (description) => <span>{description || "-"}</span>,
+      render: (description: string) => <span>{description}</span>,
       width: 200,
     },
-
     {
-      title: "Үндсэн үнэ",
-      dataIndex: "price",
-      key: "price",
-      render: (price) => <span>{price}₮</span>,
-      width: 120,
+      title: "Ирсэн огноо",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (createdAt: string) => (
+        <span>{new Date(createdAt).toLocaleDateString()}</span>
+      ),
+      width: 150,
     },
-
     {
-      title: "Хямдарсан үнэ",
-      dataIndex: "price",
-      key: "price",
-      render: (price) => <span>{price}₮</span>,
-      width: 120,
+      title: "Хэрэглэгч",
+      dataIndex: "user",
+      key: "user",
+      render: (user: string) => <span>{user}</span>,
+      width: 100,
     },
+    {
+      title: "Эрэмбэ",
+      dataIndex: "priority",
+      key: "priority",
+      render: (priority: string) => {
+        let priorityTextColor = "";
+        let priorityBgColor = "";
 
+        if (priority === "Яаралтай") {
+          priorityTextColor = "#FAC515";
+          priorityBgColor = "#FEFBE8";
+        } else if (priority === "Энгийн") {
+          priorityTextColor = "#374151";
+          priorityBgColor = "#F0F2F5";
+        }
+
+        return (
+          <span
+            style={{
+              color: priorityTextColor,
+              backgroundColor: priorityBgColor,
+              padding: "4px 8px",
+              borderRadius: "8px",
+            }}>
+            {priority}
+          </span>
+        );
+      },
+      width: 100,
+    },
     {
       title: "Төлөв",
       dataIndex: "status",
       key: "status",
-      render: (status) => (
-        <Tag
-          className="rounded-xl"
-          color={status === "ACTIVE" ? "green" : "gray"}>
-          {status === "ACTIVE" ? "Бүртгэсэн" : "Түр хадгалсан"}
-        </Tag>
-      ),
-      width: 120,
-    },
+      render: (status: string) => {
+        let tagStyle = {};
+        if (status === "Шийдвэрлэсэн") {
+          tagStyle = {
+            borderRadius: "8px",
+            border: "1px solid #D1FAE5",
+            color: "#039855",
+            backgroundColor: "#ECFDF3",
+          };
+        } else if (status === "Шийдвэрлэх") {
+          tagStyle = {
+            borderRadius: "8px",
+            border: "1px solid #FEE2E2",
+            color: "#B91C1C",
+            backgroundColor: "#FEF3F2",
+          };
+        } else if (status === "Хүлээгдэж байгаа") {
+          tagStyle = {
+            borderRadius: "8px",
+            color: "black",
+            backgroundColor: "#F0F2F5",
+          };
+        }
 
-    {
-      title: "Төрөл",
-      dataIndex: "e",
-      key: "pricee",
-      render: (price) => <span>{price}</span>,
-      width: 120,
-    },
-
-    {
-      title: "Сүүлд өөрчилсөн огноо",
-      dataIndex: "updatedAt",
-      key: "updatedAt",
-      render: (updatedAt) => (
-        <span>{new Date(updatedAt).toLocaleDateString()}</span>
-      ),
+        return (
+          <Tag style={tagStyle} className="rounded-full">
+            {status}
+          </Tag>
+        );
+      },
       width: 150,
     },
-
     {
-      title: "Өөрчилсөн хэрэглэгч",
-      dataIndex: "updatedUserId",
-      key: "updatedUserId",
-      render: (id) => (
+      title: "Хариуцсан ажилтан",
+      dataIndex: "responsible",
+      key: "responsible",
+      render: (responsible: string) => <span>{responsible}</span>,
+      width: 150,
+    },
+    {
+      title: "Шийдвэрлэсэн огноо",
+      dataIndex: "resolvedAt",
+      key: "resolvedAt",
+      render: (resolvedAt: string) => (
         <span>
-          {id}
-          {/* <img src="" alt="" /> */}
+          {resolvedAt ? new Date(resolvedAt).toLocaleDateString() : "-"}
         </span>
       ),
-      width: 120,
+      width: 150,
     },
   ];
 
   return (
-    <div className="flex w-full gap-3">
-      {/* {isFilterVisible && (
-        <div className="w-64 p-4 rounded-xl bg-gray-50 flex flex-col gap-4">
-          <div className="flex justify-between items-center">
-            <h2 className="font-semibold">Шүүлтүүр</h2>
-            <button
-              onClick={toggleFilter}
-              className="text-gray-500 hover:text-gray-700">
-              <IoCloseOutline className="w-5 h-5" />
+    <div className="flex flex-col bg-white rounded-xl gap-4 w-full">
+      <div className="flex justify-between h-[60px] items-center border-b border-gray-200 px-4">
+        <div className="flex gap-6 items-center justify-center">
+          <div className="font-bold text-lg">Санал хүсэлт</div>
+          <div className="flex gap-2 text-sm text-gray-500">
+            Нийт:
+            <div className="text-black text-sm font-bold"></div>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => onRefresh()}
+            className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
+            <img src="/image.png" alt="" className="w-4 h-4" />
+          </button>
+          <button className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
+            <img src="/image copy.png" alt="" className="w-4 h-4" />
+          </button>
+          <button className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] w-9 rounded-xl border-2 border-gray-300 justify-center items-center gap-2 p-2">
+            <img src="/image copy 2.png" alt="" className="w-[14px] h-4" />
+          </button>
+          <button className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] w-9 rounded-xl border-2 border-gray-300 justify-center items-center gap-2 p-2">
+            <img src="/image copy 7.png" alt="" className="w-[14px] h-4" />
+          </button>
+          <div className="flex gap-2">
+            <button className="h-[36px] gap-2 flex items-center justify-center bg-white rounded-xl border  px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
+              <img src="/image copy 8.png" alt="" className="w-[14px] h-4" />
+              Хэвлэх
             </button>
           </div>
-          <FilterPanel />
         </div>
-      )} */}
+      </div>
+      <div className="flex">
+        <div
+          className={`flex flex-col px-4 gap-4 rounded-xl bg-white transition-all duration-300 ${
+            isDetailsVisible ? "w-[calc(100%-280px)]" : "w-full"
+          }`}>
+          <Table
+            columns={columns}
+            dataSource={feedbacks.map((feedback) => ({
+              ...feedback,
+              key: feedback.id,
+            }))}
+            pagination={{ pageSize: 7, showSizeChanger: false }}
+            rowClassName={(record: Feedback) =>
+              `cursor-pointer ${selectedFeedback?.id === record.id ? "" : ""}`
+            }
+            onRow={(record) => ({
+              onClick: () => handleRowClick(record),
+            })}
+            className="w-full"
+          />
+        </div>
 
-      <div className="flex flex-col gap-4 w-full rounded-xl bg-white">
-        <div className="flex justify-between  h-[60px] items-center border-b border-gray-200 px-4">
-          <div className="flex gap-6 items-center justify-center">
-            <div className="font-bold text-lg">Санал хүсэлт</div>
-            <div className="flex gap-2 text-sm text-gray-500">
-              Нийт:
-              <div className="text-black text-sm font-bold">
-                {filteredProducts.length}
+        {/* Right side Details */}
+        {isDetailsVisible && selectedFeedback && (
+          <div className="w-[280px] flex flex-col gap-5 p-4 rounded-xl bg-white shadow-md border border-gray-200">
+            {/* Header хэсэг */}
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                <img
+                  src={selectedFeedback.user}
+                  alt="icon"
+                  className="w-6 h-6 "
+                />
+              </div>
+              <h3 className="font-semibold text-lg text-gray-800 truncate">
+                {selectedFeedback.name}
+              </h3>
+            </div>
+
+            {/* Төрөл ба төлөв */}
+            <div className="mt-3 text-sm ">
+              <p className="text-gray-500">Төрөл</p>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="font-medium text-[#374151] bg-[#F0F2F5] px-2 py-1 rounded-md inline-block">
+                  {selectedFeedback.type}
+                </p>
+                <p className="font-medium text-[#FAC515] bg-[#FEFBE8] px-2 py-1 rounded-md inline-block">
+                  {selectedFeedback.priority}
+                </p>
               </div>
             </div>
-          </div>
 
-          <div className="flex gap-2">
-            <button
-              onClick={toggleFilter}
-              className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
-              <img src="/image.png" alt="" className="w-4 h-4" />
-            </button>
-            <button
-              onClick={toggleFilter}
-              className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
-              <img src="/image copy.png" alt="" className="w-4 h-4" />
-            </button>
-            <button
-              onClick={toggleFilter}
-              className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] w-9 rounded-xl border-2 border-gray-300 justify-center items-center gap-2 p-2">
-              <img src="/image copy 2.png" alt="" className="w-[14px] h-4" />
-            </button>
-            {/* <div className="flex gap-2">
-              <button
-                onClick={showModal}
-                className="h-[36px] gap-2 flex items-center justify-center bg-[#3051A0] hover:bg-[#203974] rounded-xl text-white px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
-                <img src="/image copy 3.png" alt="" className="w-[14px] h-4" />
-                Бараа бүртгэх
-              </button>
-            </div> */}
+            {/* Хэрэглэгч */}
+            <div className="mt-3 text-sm">
+              <p className="text-gray-500">Хэрэглэгч</p>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">
+                  {selectedFeedback.user}
+                </div>
+                <p className="font-medium">{selectedFeedback.name}</p>
+              </div>
+            </div>
+
+            {/* Огноо */}
+            <div className="mt-3 text-sm">
+              <p className="text-gray-500">Ирсэн огноо</p>
+              <p className="font-medium">{selectedFeedback.createdAt}</p>
+            </div>
+
+            {/* Гарчиг */}
+            <div className="mt-3 text-sm">
+              <p className="text-gray-500">Гарчиг</p>
+              <p className="font-medium">{selectedFeedback.name}</p>
+            </div>
+
+            {/* Дэлгэрэнгүй */}
+            <div className="mt-3 text-sm">
+              <p className="text-gray-500">Дэлгэрэнгүй</p>
+              <p className="text-gray-700">{selectedFeedback.description}</p>
+            </div>
+
+            {/* Шийдэл хэсэг */}
+            {selectedFeedback.status === "Шийдвэрлэсэн" && (
+              <div className="mt-4 p-3 bg-green-50 border-l-4 border-green-500 rounded-lg">
+                <p className="text-green-700 font-medium">
+                  Төлөв: {selectedFeedback.status}
+                </p>
+                <div className="mt-2 text-sm">
+                  <p className="text-gray-500">Шийдвэрлэсэн ажилтан</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">
+                      {selectedFeedback.responsible}
+                    </div>
+                    <p className="font-medium">
+                      {selectedFeedback.responsible}
+                    </p>
+                  </div>
+                  <p className="text-gray-500 mt-2">Шийдвэрлэсэн огноо</p>
+                  <p className="font-medium">{selectedFeedback.resolvedAt}</p>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-        <Table
-          columns={columns}
-          dataSource={filteredProducts.map((product) => ({
-            ...product,
-            key: product.id,
-          }))}
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: false,
-          }}
-          className="w-full"
-          rowClassName={() => " cursor-pointer"}
-          onRow={(record) => ({
-            onClick: () => toggleDetail(),
-          })}
-          style={{
-            overflowY: "hidden",
-          }}
-        />
+        )}
       </div>
-
-      {/* {isDetailsVisible && (
-        <div className="w-64 p-4 rounded-xl bg-gray-50">
-          <ProductDetails />
-        </div>
-      )} */}
     </div>
   );
 };
 
-export default FeedBackList;
+const App = () => {
+  return <FeedBackList feedbacks={feedbacks} />;
+};
+
+export default App;
