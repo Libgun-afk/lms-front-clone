@@ -1,7 +1,14 @@
-"use client";
+import UsersList from "@/components/users/UserList";
 
-const Users = () => {
-  return <div className="dashboard-page">users Page</div>;
-};
 
-export default Users;
+
+
+export default async function UsersPage() {
+  // const branches = await getBranches();
+
+  return (
+    <div >
+      <UsersList />
+    </div>
+  );
+}
