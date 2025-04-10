@@ -31,9 +31,9 @@ const SideBar = () => {
   };
 
   const handleLogout = () => {
-    deleteCookie('userToken');
-    localStorage.removeItem('userData');
-    localStorage.removeItem('userToken');
+    deleteCookie("userToken");
+    localStorage.removeItem("userData");
+    localStorage.removeItem("userToken");
     routerRedirect.refresh();
   };
 
@@ -91,7 +91,21 @@ const SideBar = () => {
             href="/v1/tailan"
             className={`menu-item ${isActive("/v1/tailan") ? "active" : ""}`}>
             <div className="icon">
-              <DiscountIcon />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-file-check-icon lucide-file-check">
+                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+                <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+                <path d="m9 15 2 2 4-4" />
+              </svg>
             </div>
 
             <p>Тайлан</p>
@@ -102,7 +116,20 @@ const SideBar = () => {
             href="/v1/feedback"
             className={`menu-item ${isActive("/v1/feedback") ? "active" : ""}`}>
             <div className="icon">
-              <DiscountIcon />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-messages-square-icon lucide-messages-square">
+                <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z" />
+                <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1" />
+              </svg>
             </div>
             <p>Санал хүсэлт</p>
           </Link>
@@ -110,31 +137,87 @@ const SideBar = () => {
         <li>
           <Link
             href="/v1/notification"
-            className={`menu-item ${isActive("/v1/settings") ? "active" : ""}`}>
+            className={`menu-item ${
+              isActive("/v1/notification") ? "active" : ""
+            }`}>
             <div className="icon">
-              <DiscountIcon />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-bell-ring-icon lucide-bell-ring">
+                <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+                <path d="M22 8c0-2.3-.8-4.3-2-6" />
+                <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+                <path d="M4 2C2.8 3.7 2 5.7 2 8" />
+              </svg>
             </div>
             <p>Мэдэгдэл</p>
           </Link>
         </li>
         <li>
           <Link
-            href="/v1/notification"
-            className={`menu-item ${isActive("/v1/settings") ? "active" : ""}`}>
+            href="/v1/log"
+            className={`menu-item ${isActive("/v1/log") ? "active" : ""}`}>
             <div className="icon">
-              <DiscountIcon />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-file-clock-icon lucide-file-clock">
+                <path d="M16 22h2a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v3" />
+                <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+                <circle cx="8" cy="16" r="6" />
+                <path d="M9.5 17.5 8 16.25V14" />
+              </svg>
             </div>
             <p>Log</p>
           </Link>
         </li>
+        <li>
+          <Link
+            href="/v1/settings"
+            className={`menu-item ${isActive("/v1/settings") ? "active" : ""}`}>
+            <div className="icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-sliders-horizontal-icon lucide-sliders-horizontal">
+                <line x1="21" x2="14" y1="4" y2="4" />
+                <line x1="10" x2="3" y1="4" y2="4" />
+                <line x1="21" x2="12" y1="12" y2="12" />
+                <line x1="8" x2="3" y1="12" y2="12" />
+                <line x1="21" x2="16" y1="20" y2="20" />
+                <line x1="12" x2="3" y1="20" y2="20" />
+                <line x1="14" x2="14" y1="2" y2="6" />
+                <line x1="8" x2="8" y1="10" y2="14" />
+                <line x1="16" x2="16" y1="18" y2="22" />
+              </svg>
+            </div>
+            <p>Эрхийн тохиргоо</p>
+          </Link>
+        </li>
       </ul>
       <div className="account-sidebar_bottom">
-        <div className="menu-shrink" onClick={handleLogout}>
-          <div className="icon">
-            <ArrowLefticon />
-          </div>
-          <p>Гарах</p>
-        </div>
         <div className="menu-shrink" onClick={handleMenuExpand}>
           <div className="icon">
             <ArrowLefticon />
@@ -144,6 +227,12 @@ const SideBar = () => {
         <div className="profile-menu">
           <div className="icon"></div>
           <p>Борлуулалтын менежер</p>
+        </div>
+        <div className="menu-shrink" onClick={handleLogout}>
+          <div className="icon">
+            <ArrowLefticon />
+          </div>
+          <p>Гарах</p>
         </div>
       </div>
     </div>
