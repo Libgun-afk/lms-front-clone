@@ -5,9 +5,20 @@ import { GET_PRODUCTS } from "@/graphql/queries";
 import { useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { LoadingOutlined } from "@ant-design/icons";
-import { Flex, Spin } from "antd";
+import { Spin } from "antd";
+import { getCookie } from "cookies-next";
+import { useRouter } from "next/navigation";
 
 const ProductPage = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = getCookie("userToken");
+    if (!token) {
+      router.push("/");
+    }
+  }, [router]);
+
   const { data, loading, error, refetch } = useQuery(GET_PRODUCTS);
   const [products, setProducts] = useState([]);
   const [refreshLoading, setRefreshLoading] = useState(false);

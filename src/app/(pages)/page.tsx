@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { Form, FormProps, Input, Checkbox, message } from "antd";
-import { MailOutlined, LockOutlined, LoadingOutlined } from "@ant-design/icons";
+import { Form, Input, message } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 import { useAtom } from "jotai/react";
 import {
   userDataAtom,
@@ -12,7 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import { setCookie } from "cookies-next";
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ForgetPassword from "@/components/ForgetPass";
 
 interface LoginType {
