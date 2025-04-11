@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Form, Input, message } from "antd";
+import { Checkbox, Form, Input, message } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useAtom } from "jotai/react";
 import {
@@ -12,7 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import { setCookie } from "cookies-next";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ForgetPassword from "@/components/ForgetPass";
 
 interface LoginType {
@@ -29,16 +29,31 @@ const LoginPage = () => {
   const [rememberData, setRememberData] = useAtom(userRememberAtom);
   const [loading, setLoading] = useState(false);
   const [showForget, setShowForget] = useState(false);
+  const [remember, setRemember] = useState<boolean>(false);
+
+  useEffect(() => {
+    const localData = localStorage.getItem("rememberUser");
+    if (localData) {
+      const parsed = JSON.parse(localData);
+      form.setFieldsValue({
+        username: parsed.username,
+        remember: true,
+      });
+      setRememberData(parsed);
+    }
+  }, []);
 
   const onFinish = async (values: LoginType) => {
     setLoading(true);
 
-    if (values.remember === true) {
-      setRememberData({ username: values.username, password: values.password });
+    if (values.remember) {
+      const userInfo = { username: values.username, password: values.password };
+      setRememberData(userInfo);
+      localStorage.setItem("rememberUser", JSON.stringify(userInfo));
     } else {
       setRememberData(null);
+      localStorage.removeItem("rememberUser");
     }
-
     try {
       const oauthVales = {
         clientId: "78deef1d-1370-49a1-8a46-7e131bbbee1a",
@@ -97,17 +112,14 @@ const LoginPage = () => {
           <h1>Loyalty Management System</h1>
         </div>
         <div className="img">
-          {/* {[...Array(6)].map((_, index) => (
-            <Image
-              key={index}
-              src={`/assets/images/auth${index + 1}.png`}
-              width={index === 5 ? 468 : 668}
-              height={[795, 796, 795, 795, 612, 689][index]}
-              alt="LMS"
-              priority
-              className={`img-${index + 1}`}
-            />
-          ))} */}
+          <Image
+            src="/assets/images/auth group.png"
+            width={1000}
+            height={1084}
+            alt="LMS"
+            priority
+            className="group-image"
+          />
         </div>
       </div>
 
@@ -133,7 +145,6 @@ const LoginPage = () => {
               autoComplete="off"
               initialValues={{
                 username: rememberData?.username,
-                password: rememberData?.password,
                 remember: true,
               }}>
               <Form.Item
@@ -148,25 +159,25 @@ const LoginPage = () => {
               <Form.Item
                 label="Нууц үг"
                 name="password"
-                rules={[{ required: true, message: "Нууц үг оруулна уу." }]}>
+                rules={[{ message: "Нууц үг оруулна уу.", required: true }]}>
                 <Input.Password placeholder="Нууц үг" />
               </Form.Item>
 
               <div className="flex justify-between items-center mb-4">
                 <Form.Item name="remember" valuePropName="checked" noStyle>
-                  <label className="flex justify-center items-center gap-2">
+                  <label className="flex justify-center items-center gap-2 text-[#414651]">
                     <input
                       type="checkbox"
-                      name="remember"
-                      className="h-6 w-6 rounded border-[#A0AEC0]"
-                    />
+                      checked={remember}
+                      onChange={(e) => setRemember(e.target.checked)}
+                      className="h-5 w-5 accent-[#0A2D75] border-[#A0AEC0] hover:accent-[#143b9f] hover:border-[#143b9f] focus:ring-0 active:ring-0"
+                    />{" "}
                     Нэвтрэх нэр сануулах
                   </label>
                 </Form.Item>
-
                 <div
                   onClick={() => setShowForget(true)}
-                  className="text-sm text-blue-500 hover:underline cursor-pointer">
+                  className="text-sm text-[#0A2D75] hover:underline cursor-pointer">
                   Нууц үг сэргээх?
                 </div>
               </div>
