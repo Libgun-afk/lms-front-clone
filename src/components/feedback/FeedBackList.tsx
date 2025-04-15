@@ -355,7 +355,7 @@ const FeedBackList: React.FC<Props> = ({ feedbacks }) => {
           </div>
         </div>
 
-        <div className=" py-4 px-4 flex">
+        <div className="h-full w-full py-4 px-4 flex">
           <Table
             id="printableTable"
             columns={columns}
