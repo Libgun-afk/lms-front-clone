@@ -504,3 +504,13 @@ textarea {
     }
   }
 }
+
+.cursor-pointer {
+  max-height: 36px;
+}
+
+.ant-table-tbody > tr > td {
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+  font-size: 13px;
+}

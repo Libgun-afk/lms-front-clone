@@ -69,7 +69,11 @@ const ProductPage = () => {
           <Spin indicator={<LoadingOutlined style={{ fontSize: 50 }} spin />} />
         </div>
       ) : (
-        <ProductList products={products} onRefresh={handleRefresh} />
+        <ProductList
+          products={products}
+          onRefresh={handleRefresh}
+          tagList={[]}
+        />
       )}
     </div>
   );

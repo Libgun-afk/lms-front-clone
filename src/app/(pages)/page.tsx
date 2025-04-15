@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Checkbox, Form, Input, message } from "antd";
+import { Form, Input, message } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useAtom } from "jotai/react";
 import {
