@@ -173,14 +173,14 @@ function BranchList() {
   }
 
   return (
-    <div className="flex w-full gap-3" onSubmit={handleSubmit}>
+    <div className="flex w-full gap-3 p-8" onSubmit={handleSubmit}>
       <iframe
         name="print_frame"
         style={{ display: "none" }}
         title="print_frame"
       />
       {isFilterVisible && (
-      <div className="w-72 p-4 border-r bg-gray-50 flex flex-col gap-4">
+      <div className="w-[300px] p-4 border-r bg-gray-50 flex flex-col gap-4  rounded-xl">
         <h2 className="font-semibold">Шүүлтүүр</h2>
         {/* Төрөл */}
         <div className="flex flex-col gap-2">
@@ -283,9 +283,8 @@ function BranchList() {
             onClick={printDiv}
             className="h-[36px] gap-2 flex items-center justify-center bg-white rounded-xl border px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
             <img src="/image copy 8.png" alt="" className="w-[14px] h-4" />
-            Хэвлэхх
+            Хэвлэх
           </button>
-
           </div>
         </div>
         <div id="printableTable" ref={pdfRef} className="bg-white p-2">

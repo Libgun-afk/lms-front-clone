@@ -9,6 +9,10 @@ import UserProfileCard from "./UserProfileCard";
 import { useRef } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import {  Modal } from 'antd';
+import {  Form, Input, InputNumber, Button } from 'antd';
+
+
 
 // Define the GraphQL query
 const GET_USERS = gql`
@@ -82,6 +86,8 @@ const UsersList = () => {
     }
   };
 
+  console.log(activeTab)
+
   const printDiv = () => {
     const printFrame = (window.frames as any)["print_frame"];
     const printableElement = document.getElementById("printableTable");
@@ -110,7 +116,27 @@ const UsersList = () => {
     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
       pdf.save("document.pdf");
     };
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [form] = Form.useForm();
+    const showModal = () => {
+    setIsModalOpen(true);
+    };
 
+    const handlehasah = () => {
+    setIsModalOpen(false);
+    };
+
+   const handlehasash = () => {
+    setIsModalOpen(false);
+   };
+  
+   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+   const [addForm] = Form.useForm();
+
+  const showAddModal = () => setIsAddModalOpen(true);
+  const handleAddNemeh = () => setIsAddModalOpen(false);
+  
+ 
 
   const columns: TableProps<any>['columns'] = [
     {
@@ -230,7 +256,7 @@ const UsersList = () => {
   }
 
   return (
-    <div className="flex flex-col bg-white rounded-xl gap-4 w-full">
+    <div className="flex-1 bg-white  gap-4 p-8">
       <iframe
         name="print_frame"
         style={{ display: "none" }}
@@ -280,15 +306,53 @@ const UsersList = () => {
             Хэвлэх
           </button>
             <button  
-            onClick={handleToggleFilter}
+            onClick={showModal}
             className="h-[36px] gap-2 flex items-center justify-center bg-white rounded-xl border  px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
-              <img src="/image copy 8.png" alt="" className="w-[14px] h-4" />
+              <img src="" alt="" className="w-[14px] h-4" />
               Оноо хасах
             </button>
-            <button className="h-[36px] gap-2 flex items-center justify-center bg-white rounded-xl border  px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
+          <Modal title="Оноо хасах" open={isModalOpen} onOk={handlehasah} onCancel={handlehasash} footer={null}>
+               <Form layout="vertical" form={form} onFinish={(values) => console.log('Form submitted:', values)}>
+              <Form.Item label="Оноо хасах утасны дугаар"name="phone"rules={[{ required: true, message: 'Утасны дугаар оруулна уу' }]}>
+                <Input placeholder="8080 5050" />
+              </Form.Item>
+              <Form.Item label="Хасах хэмжээ"name="amount"rules={[{ required: true, message: 'Хэмжээ оруулна уу' }]}>
+                <InputNumber style={{ width: '100%' }}placeholder="10,000"min={1}step={100}/>
+              </Form.Item>
+              <Form.Item label="Тайлбар"name="description"rules={[{ required: true, message: 'Тайлбар оруулна уу' }]}>
+               <Input.TextArea placeholder="Онооны тайлбар" rows={3} />
+              </Form.Item>
+             <Form.Item> 
+             <Button type="primary"htmlType="submit"icon={<span style={{ marginRight: 4 }}></span>}block>
+               Оноо хасах
+             </Button>
+             </Form.Item>
+             </Form>
+            </Modal>
+            <button 
+              onClick={showAddModal}
+              className="h-[36px] gap-2 flex items-center justify-center bg-white rounded-xl border  px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
               <img src="/image copy 3.png" alt="" className="w-[14px] h-4" />
               Оноо нэмэх
             </button>
+            <Modal title="Оноо нэмэх" open={isAddModalOpen} onOk={handleAddNemeh} onCancel={handleAddNemeh} footer={null}>
+                <Form layout="vertical" form={addForm} onFinish={(values) => {console.log('Нэмсэн утга:', values); addForm.resetFields();handleAddNemeh();}}>
+               <Form.Item label="Утасны дугаар" name="phone" rules={[{ required: true, message: 'Утасны дугаар оруулна уу' }]}>
+                  <Input placeholder="8080 5050" />
+               </Form.Item>
+               <Form.Item label="Нэмэх хэмжээ" name="amount"rules={[{ required: true, message: 'Хэмжээ оруулна уу' }]}>
+                    <InputNumber style={{ width: '100%' }} placeholder="10,000" min={1} step={100} />
+               </Form.Item>
+               <Form.Item  label="Тайлбар"name="description"rules={[{ required: true, message: 'Тайлбар оруулна уу' }]}>
+                    <Input.TextArea placeholder="Онооны тайлбар" rows={3} />
+               </Form.Item>
+               <Form.Item>
+                  <Button type="primary" htmlType="submit" icon={<span style={{ marginRight: 4 }}></span>} block>
+                      Оноо нэмэх
+               </Button>
+              </Form.Item>
+             </Form>
+            </Modal>
           </div>
         </div>
       </div>
@@ -357,15 +421,14 @@ const UsersList = () => {
               onChange={(values) => setSelectedUser(values as string[])}
             />
           </div>
-
           <button className="gap-2 flex justify-center items-center bg-[#3051A0] text-white p-2 pl-1 rounded-xl">
             <IoAddOutline className="w-[18px] h-[16px]" />
-            Шүүхх
+            Шүүх
           </button>
         </div>
       )}
       <div
-        className={`flex flex-col px-4 gap-4 rounded-xl bg-white transition-all duration-300 ${
+        className={`flex flex-col px-4 gap-4 rounded-xl bg-white transition-all duration-300 p-4 ${
           isDetailsVisible ? "w-[calc(100%-280px)]" : "w-full"
         }`}
       >
@@ -388,9 +451,8 @@ const UsersList = () => {
         />
          </div>
       </div>
-        {/* Right side Details */}
         {isDetailsVisible && selectedUser && (
-          <div className="w-[400px] flex flex-col gap-5 p-4 rounded-xl bg-white shadow-md border border-gray-200">
+          <div className="w-[400px] flex flex-col gap-5 p-4 rounded-xl bg-white shadow-md border-gray-200">
             {/* Header хэсэг */}
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
@@ -400,53 +462,54 @@ const UsersList = () => {
                   className="w-6 h-6 "
                 />
               </div>
-              <h3 className="font-semibold text-lg text-gray-800 truncate">
+              <h3 className="font-semibold text-lg text-gray-800 truncate flex-1">
                 {selectedUser?.phoneNumber}
               </h3>
-              <h3 className="font-semibold text-lg text-gray-800 truncate">
-                {selectedUser?.points}
+              <h3 className="font-semibold text-gray-800 truncate">
+                {selectedUser?.wallet?.balance}₮
               </h3>
             </div>
+
+            
             {/* Төрөл ба төлөв */}
             <div className="relative grid grid-cols-2 bg-gray-100 dark:bg-gray-800 w-[350px] h-9 rounded-xl border border-gray-300 dark:border-gray-700 overflow-hidden">
-         <div
-            className={
-              "absolute top-[2px] bottom-[2px] w-[calc(49%-3px)] bg-white dark:bg-gray-700 rounded-xl transition-transform duration-300 " +
-              (activeTab === "supply"
-                ? "translate-x-[calc(100%+12px)]"
-                : "translate-x-[2px]")
-            }
-          />
-          <div>
+              <div
+                  className={
+                    "absolute top-[2px] border-2 bottom-[2px] w-[calc(49%-3px)] bg-white dark:bg-gray-700 rounded-xl transition-transform duration-300 " +
+                    (activeTab === "supply"
+                      ? "translate-x-[calc(100%+12px)]"
+                      : "translate-x-[2px]")
+                  }
+                />
+              <div className="flex flex-row">
+                  <button
+                  onClick={() => setActiveTab("users")}
+                    className={`relative z-30 px-2 py-1.5 w-full text-center flex justify-center pt-1 font-medium transition-all duration-300 rounded-xl ${
+                    activeTab === "users"
+                    ? "text-black"
+                    : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300"
+                  }`}
+                >
+                    Хувийн мэдээлэл
+                  </button>
+
+                  {/* Бусад таб товчнууд */}
+              </div>
               <button
-               onClick={() => setActiveTab("users")}
-                className={`relative z-30 px-2 py-1.5 w-[200px] text-center flex justify-center pt-1 font-medium transition-all duration-300 rounded-xl ${
-                activeTab === "users"
-                ? "text-black"
-                : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300"
-               }`}
-             >
-                 Хувийн мэдээлэл
+                onClick={() => setActiveTab("supply")}
+                className={`relative z-10 px-2 py-1.5 w-full text-center flex justify-center pt-1 font-medium transition-all duration-300 rounded-xl ${
+                  activeTab === "supply"
+                    ? "text-black"
+                    : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300"
+                }`}
+              >
+                Онооны түүх
               </button>
+          </div>
 
-              {/* Бусад таб товчнууд */}
-
-               <div className="mt-4">
-                 {activeTab === "users" && <UserProfileCard />}
-                 {/* өөр табуудын компонентууд */}
-                 </div>
-           </div>
-          <button
-            onClick={() => setActiveTab("supply")}
-            className={`relative z-10 px-2 py-1.5 w-[200px] text-center flex justify-center pt-1 font-medium transition-all duration-300 rounded-xl ${
-              activeTab === "supply"
-                ? "text-black"
-                : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300"
-            }`}
-          >
-            Онооны түүх
-          </button>
-        </div>
+          <div className="mt-4">
+              {activeTab === "users" && <UserProfileCard isCancel />} 
+          </div>
        </div>
         )}
      </div>
