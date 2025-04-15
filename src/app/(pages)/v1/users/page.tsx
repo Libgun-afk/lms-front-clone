@@ -1,6 +1,8 @@
 "use client";
 
+
 import UsersList from "@/components/users/UserList";
+
 import { getCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -14,11 +16,13 @@ const Users = () => {
       router.push("/");
     }
   }, [router]);
+
   return (
     <div >
       <UsersList/>
     </div>
   )
+
 };
 
 export default Users;

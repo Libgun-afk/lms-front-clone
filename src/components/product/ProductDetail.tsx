@@ -6,7 +6,7 @@ interface Product {
   status: string;
   code: string;
   price: number;
-  // tags: Tag[];
+  // tags: { id: string; name: string }[];
   description: string;
   promotionProduct: { code: string; name: string };
   images: { url: string }[];

@@ -88,7 +88,7 @@ const ForgetPassword = ({ onBack }: { onBack: () => void }) => {
         }
         setLoading(false);
       }, 800);
-    } catch (err) {
+    } catch (error) {
       setLoading(false);
     }
   };

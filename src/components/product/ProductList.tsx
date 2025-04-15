@@ -32,12 +32,17 @@ interface Product {
 interface ProductListProps {
   products: Product[];
   onRefresh: () => void;
+  tagList: Tag[];
 }
 
-const ProductList: React.FC<ProductListProps> = ({ products, onRefresh }) => {
+const ProductList: React.FC<ProductListProps> = ({
+  products,
+  onRefresh,
+  tagList,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDetailsVisible, setIsDetailsVisible] = useState(false); // Modal toggle
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null); // Selected product
+  const [isDetailsVisible, setIsDetailsVisible] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -51,6 +56,8 @@ const ProductList: React.FC<ProductListProps> = ({ products, onRefresh }) => {
     setSelectedProduct(product);
     setIsDetailsVisible(true);
   };
+
+  console.log(tagList);
 
   const [filter, setFilter] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
@@ -75,7 +82,6 @@ const ProductList: React.FC<ProductListProps> = ({ products, onRefresh }) => {
     const printFrame = (window.frames as any)["print_frame"];
     const printableElement = document.getElementById("printableTable");
 
-    // Check if the element exists
     if (printableElement) {
       const printableContent = printableElement.innerHTML;
       printFrame.document.body.innerHTML = printableContent;
@@ -91,67 +97,145 @@ const ProductList: React.FC<ProductListProps> = ({ products, onRefresh }) => {
       title: "Барааны код",
       dataIndex: "code",
       key: "code",
+      align: "center",
       render: (code) => <span>{code}</span>,
-      width: 120,
+      width: 104,
     },
+
     {
       title: "Зураг",
       dataIndex: "images",
       key: "images",
-      render: (images) => (
-        <Image
-          src={images.length > 0 ? images[0]?.url : "0"}
-          alt=""
-          style={{ width: "40px", height: "40px" }} // Adjusted image size
-        />
-      ),
-      width: 120,
+      align: "center",
+      render: (images) =>
+        images.length > 0 ? (
+          <Image
+            src={images[0]?.url}
+            alt="Зураг"
+            style={{ width: "40px", height: "40px", objectFit: "cover" }}
+            preview={false}
+          />
+        ) : (
+          <div className="w-10 h-10 flex items-center justify-center bg-gray-100 text-gray-500 text-xs rounded">
+            —
+          </div>
+        ),
+      width: 60,
     },
     {
       title: "Барааны нэр",
       dataIndex: "name",
       key: "name",
+      align: "center",
+
       render: (name) => <span>{name}</span>,
-      width: 180,
+      width: 278,
+    },
+    {
+      title: "Дагалдах бэлэг",
+      dataIndex: "promotionProduct",
+      key: "promotionProduct",
+      align: "center",
+
+      render: (promotionProduct) => <span>{promotionProduct}</span>,
+      width: 90,
     },
     {
       title: "Тайлбар",
       dataIndex: "description",
       key: "description",
+      align: "center",
+
       render: (description) => <span>{description || "-"}</span>,
-      width: 200,
+      width: 338,
     },
     {
       title: "Үндсэн үнэ",
       dataIndex: "price",
       key: "price",
+      align: "center",
+
       render: (price) => <span>{price}₮</span>,
-      width: 120,
+      width: 104,
     },
     {
       title: "Хямдарсан үнэ",
       dataIndex: "salePrice",
       key: "salePrice",
+      align: "center",
+
       render: (salePrice) => <span>{salePrice}₮</span>,
-      width: 120,
+      width: 104,
     },
+
     {
       title: "Төлөв",
       dataIndex: "status",
       key: "status",
-      render: (status) => (
-        <Tag
-          className="rounded-xl"
-          color={status === "ACTIVE" ? "green" : "gray"}>
-          {status === "ACTIVE" ? "Идэвхтэй" : "Идэвхгүй"}
-        </Tag>
-      ),
+      align: "center",
+      render: (status) => {
+        let bgColor = "bg-gray-200 text-gray-800";
+
+        switch (status) {
+          case "ACTIVE":
+            bgColor = "bg-[#ECFDF3] text-[#039855]";
+            break;
+          case "INACTIVE":
+            bgColor = "bg-[#F0F2F5] text-[#374151]";
+            break;
+        }
+
+        return (
+          <span className={`text-sm px-2 py-0 rounded-xl ${bgColor}`}>
+            {status === "ACTIVE" ? "Идэвхтэй" : "Идэвхгүй"}
+          </span>
+        );
+      },
       width: 120,
+    },
+
+    {
+      title: "Төрөл",
+      dataIndex: "tags",
+      key: "tags",
+      align: "center",
+
+      render: (tags: Tag[]) => (
+        <div className="flex justify-center gap-1">
+          {tags.map((tag, index) => {
+            let bgColor = "bg-gray-200 text-gray-800";
+
+            switch (tag.name) {
+              case "Хямдарсан":
+                bgColor = "bg-[#FEFBE8] text-[#FAC515]";
+                break;
+              case "Шинэ":
+                bgColor = "bg-[#ECFDF3] text-[#039855]";
+                break;
+              case "Онцлох":
+              case "Нэрийн":
+              case "Урамшуулалтай":
+                bgColor = "bg-[#F0F2F5] text-[#374151]";
+                break;
+            }
+
+            return (
+              <span
+                key={tag.id ?? index}
+                className={`text-sm px-2 py-0 rounded-xl ${bgColor}`}>
+                {tag.name}
+              </span>
+            );
+          })}
+        </div>
+      ),
+      width: 220,
     },
     {
       title: "Сүүлд өөрчилсөн огноо",
       dataIndex: "updatedAt",
       key: "updatedAt",
+      align: "center",
       render: (updatedAt) => (
         <span>{new Date(updatedAt).toLocaleDateString()}</span>
       ),
@@ -161,6 +245,8 @@ const ProductList: React.FC<ProductListProps> = ({ products, onRefresh }) => {
       title: "Өөрчилсөн хэрэглэгч",
       dataIndex: "updatedUserId",
       key: "updatedUserId",
+      align: "center",
+
       render: (id) => <span>{id}</span>,
       width: 120,
     },
@@ -220,7 +306,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, onRefresh }) => {
                 <div className="bg-white p-6 rounded-lg shadow-lg z-50">
                   <CreateProduct
                     onClose={handleCloseModal}
-                    onRefresh={onRefresh}
+                    // onRefresh={onRefresh}
                     // products={products}
                   />
                 </div>
@@ -239,15 +325,16 @@ const ProductList: React.FC<ProductListProps> = ({ products, onRefresh }) => {
           };
         })}
         pagination={{
-          pageSize: 8,
+          pageSize: 12,
           showSizeChanger: false,
         }}
-        className="w-full"
+        className="w-full px-4"
         rowClassName={() => "cursor-pointer"}
         onRow={(record) => ({
           onClick: () => handleProductClick(record),
         })}
       />
+
       {isDetailsVisible && selectedProduct && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ">
           <div className=" rounded shadow-lg z-50">

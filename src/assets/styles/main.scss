@@ -188,7 +188,7 @@ textarea {
   .auth-page_background {
     width: 50%;
     height: 100%;
-    background: linear-gradient(146.18deg, #0a2d75 -1.09%, #bdd3ff 182.62%);
+    background: linear-gradient(146.18deg, #0a2d75 -1.09%, #f0f2f5 182.62%);
     overflow: hidden;
     .detail {
       padding: 80px 72px;
@@ -201,64 +201,47 @@ textarea {
         font-weight: 700;
       }
     }
+    // .img {
+    //   position: relative;
+    //   height: calc(100% - 198px);
+    //   @for $i from 0 through 10 {
+    //     .img-#{$i} {
+    //       position: absolute;
+    //     }
+    //   }
+
+    //   @keyframes animeImage {
+    //     0% {
+    //       transform: translate(50%, 50%);
+    //       opacity: 0;
+    //     }
+    //     100% {
+    //       transform: translate(0%, 0%);
+    //       opacity: 1;
+    //     }
+    //   }
+    // }
     .img {
       position: relative;
       height: calc(100% - 198px);
-      @for $i from 0 through 10 {
-        .img-#{$i} {
-          position: absolute;
-        }
-      }
-      .img-1 {
-        left: 12px;
-        bottom: 120px;
-        width: calc(446px - 60px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .group-image {
+        max-width: 100%;
         height: auto;
-        animation: animeImage 0.4s linear;
+        animation: fadeIn 1s ease-in-out;
       }
-      .img-2 {
-        left: 208px;
-        bottom: 282px;
-        width: calc(446px - 60px);
-        height: auto;
-        animation: animeImage 0.4s linear;
-      }
-      .img-3 {
-        right: 96px;
-        bottom: 306px;
-        width: calc(444px - 60px);
-        height: auto;
-        animation: animeImage 0.4s linear;
-      }
-      .img-4 {
-        bottom: -260px;
-        right: 348px;
-        width: calc(444px - 60px);
-        height: auto;
-        animation: animeImage 0.4s linear;
-      }
-      .img-5 {
-        bottom: 0;
-        right: 140px;
-        width: calc(446px - 60px);
-        height: auto;
-        animation: animeImage 0.4s linear;
-      }
-      .img-6 {
-        bottom: 0;
-        right: 0;
-        width: calc(312px - 60px);
-        height: auto;
-        animation: animeImage 0.3s linear;
-      }
-      @keyframes animeImage {
+
+      @keyframes fadeIn {
         0% {
-          transform: translate(50%, 50%);
           opacity: 0;
+          transform: scale(0.95);
         }
         100% {
-          transform: translate(0%, 0%);
           opacity: 1;
+          transform: scale(1);
         }
       }
     }
@@ -520,4 +503,14 @@ textarea {
       }
     }
   }
+}
+
+.cursor-pointer {
+  max-height: 36px;
+}
+
+.ant-table-tbody > tr > td {
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+  font-size: 13px;
 }
