@@ -13,7 +13,7 @@ const httpLink = createHttpLink({
 
 const authLink = setContext((_, { headers }) => {
   const token = getCookie("userToken");
-  console.log("Token in Apollo:", token);
+  // console.log("Token in Apollo:", token);
   return {
     headers: {
       ...headers,

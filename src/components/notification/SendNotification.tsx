@@ -1,4 +1,4 @@
-import { Checkbox, Input } from "antd";
+import { Input } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import React, { useState } from "react";
 
