@@ -11,11 +11,28 @@ import PeopleIcon from "@/assets/icons/people.svg";
 import BranchIcon from "@/assets/icons/branch.svg";
 import ArrowLefticon from "@/assets/icons/arrow-left.svg";
 import { deleteCookie } from "cookies-next";
+import { decodeToken } from "@/lib/tokenUtils";
+import { getCookie } from "cookies-next";
+import { useEffect, useState } from "react";
 
 const SideBar = () => {
   const router = usePathname();
   const routerRedirect = useRouter();
   const [sidebarShrink, setSidebarShrink] = useAtom(sidebarShrinkAtom);
+  const [userInfo, setUserInfo] = useState<{ name?: string; role?: string }>({});
+
+  useEffect(() => {
+    const token = getCookie("userToken");
+    if (token) {
+      const decoded = decodeToken(token as string);
+      if (decoded) {
+        setUserInfo({
+          name: decoded.name,
+          role: decoded.role
+        });
+      }
+    }
+  }, []);
 
   const isActive = (path: string) => {
     if (path === router) return true;
@@ -38,7 +55,7 @@ const SideBar = () => {
     <div className={`account-sidebar ${sidebarShrink ? "shrink" : ""}`}>
       <div className="logo-img">
         <Image src="/logo.png" width={76} height={49} alt="LMS" priority />
-        <p>LMS</p>
+        {!sidebarShrink && <p>LMS</p>}
       </div>
       <ul className="account-sidebar_menu">
         <li>
@@ -50,7 +67,7 @@ const SideBar = () => {
             <div className="icon">
               <DashboardIcon />
             </div>
-            <p>Хянах самбар</p>
+            {!sidebarShrink && <p>Хянах самбар</p>}
           </Link>
         </li>
         <li>
@@ -60,7 +77,7 @@ const SideBar = () => {
             <div className="icon">
               <ProductIcon />
             </div>
-            <p>Бараа материал</p>
+            {!sidebarShrink && <p>Бараа материал</p>}
           </Link>
         </li>
         <li>
@@ -70,7 +87,7 @@ const SideBar = () => {
             <div className="icon">
               <PeopleIcon />
             </div>
-            <p>Хэрэглэгч</p>
+            {!sidebarShrink && <p>Хэрэглэгч</p>}
           </Link>
         </li>
         <li>
@@ -80,7 +97,7 @@ const SideBar = () => {
             <div className="icon">
               <BranchIcon />
             </div>
-            <p>Салбар</p>
+            {!sidebarShrink && <p>Салбар</p>}
           </Link>
         </li>
         <li>
@@ -104,8 +121,7 @@ const SideBar = () => {
                 <path d="m9 15 2 2 4-4" />
               </svg>
             </div>
-
-            <p>Тайлан</p>
+            {!sidebarShrink && <p>Тайлан</p>}
           </Link>
         </li>
         <li>
@@ -128,7 +144,7 @@ const SideBar = () => {
                 <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1" />
               </svg>
             </div>
-            <p>Санал хүсэлт</p>
+            {!sidebarShrink && <p>Санал хүсэлт</p>}
           </Link>
         </li>
         <li>
@@ -155,7 +171,7 @@ const SideBar = () => {
                 <path d="M4 2C2.8 3.7 2 5.7 2 8" />
               </svg>
             </div>
-            <p>Мэдэгдэл</p>
+            {!sidebarShrink && <p>Мэдэгдэл</p>}
           </Link>
         </li>
         <li>
@@ -180,7 +196,7 @@ const SideBar = () => {
                 <path d="M9.5 17.5 8 16.25V14" />
               </svg>
             </div>
-            <p>Log</p>
+            {!sidebarShrink && <p>Log</p>}
           </Link>
         </li>
         <li>
@@ -210,7 +226,7 @@ const SideBar = () => {
                 <line x1="16" x2="16" y1="18" y2="22" />
               </svg>
             </div>
-            <p>Эрхийн тохиргоо</p>
+            {!sidebarShrink && <p>Эрхийн тохиргоо</p>}
           </Link>
         </li>
       </ul>
@@ -219,11 +235,16 @@ const SideBar = () => {
           <div className="icon">
             <ArrowLefticon />
           </div>
-          <p>Багасгах</p>
+          {!sidebarShrink && <p>Багасгах</p>}
         </div>
         <div className="profile-menu">
           <div className="icon"></div>
-          <p>Борлуулалтын менежер</p>
+          {!sidebarShrink && (
+            <>
+              <p>{userInfo.name || "Хэрэглэгч"}</p>
+              <small>{userInfo.role || ""}</small>
+            </>
+          )}
         </div>
         <div className="menu-shrink" onClick={handleLogout}>
           <div className="icon">
@@ -243,7 +264,7 @@ const SideBar = () => {
               <line x1="21" x2="9" y1="12" y2="12" />
             </svg>{" "}
           </div>
-          <p>Гарах</p>
+          {!sidebarShrink && <p>Гарах</p>}
         </div>
       </div>
     </div>

@@ -11,7 +11,8 @@ import {
 } from "@/components/Provider";
 import { useRouter } from "next/navigation";
 import { setCookie } from "cookies-next";
-import axios from "axios";
+// import axios from "axios";
+import axios from "@/lib/axiosInstance";
 import { useEffect, useState } from "react";
 import ForgetPassword from "@/components/ForgetPass";
 
@@ -88,6 +89,7 @@ const LoginPage = () => {
         if (resGetToken.status === 201) {
           const resultToken = resGetToken.data.result;
           setCookie("userToken", resultToken.access_token);
+          setCookie("refreshToken", resultToken.refresh_token);
           setUserToken(resultToken.access_token);
           setUserData(resultToken);
           setLoading(false);

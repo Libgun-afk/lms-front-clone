@@ -2,6 +2,7 @@
 
 import SideBar from "./sidebar";
 import Link from "next/link";
+import PageTitle from "@/components/PageTitle";
 
 export default function DashboardLayout({
   children,
@@ -13,11 +14,9 @@ export default function DashboardLayout({
         <div className="account-footer">
           <ul>
             <li>
-              <p>Нүүр хуудас</p>
+              <Link href="/v1/controlpanel">Нүүр хуудас</Link>
             </li>
-            <li>
-              <Link href="#">Бараа материал</Link>
-            </li>
+            <PageTitle />
           </ul>
           <p>Back-Office System v0.0.3 | © Blueprint LLC 2025</p>
         </div>

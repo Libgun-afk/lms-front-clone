@@ -6,14 +6,27 @@ import {
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { getCookie } from "cookies-next";
+import { shouldRefreshToken, refreshAccessToken } from "./tokenUtils";
 
 const httpLink = createHttpLink({
   uri: process.env.NEXT_PUBLIC_GRAPHQL_URI,
 });
 
-const authLink = setContext((_, { headers }) => {
-  const token = getCookie("userToken");
-  // console.log("Token in Apollo:", token);
+const authLink = setContext(async (_, { headers }) => {
+  const token = getCookie("userToken") as string | undefined;
+  
+  if (token && shouldRefreshToken(token)) {
+    const newToken = await refreshAccessToken();
+    if (newToken) {
+      return {
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${newToken}`,
+        },
+      };
+    }
+  }
+
   return {
     headers: {
       ...headers,
