@@ -58,7 +58,9 @@ const LoginPage = () => {
     try {
       const oauthVales = {
         clientId: "78deef1d-1370-49a1-8a46-7e131bbbee1a",
-        redirectUri: "localhost:3000",
+        // redirectUri: "localhost:3000",
+        redirectUri:
+          process.env.NEXT_PUBLIC_REDIRECT_URI || "http://localhost:3000",
         responseType: "code",
         scope: ["read:users"],
         state: "api",
