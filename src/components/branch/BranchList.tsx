@@ -1,14 +1,17 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Table, Tag, Image, Checkbox } from "antd";
 import type { TableProps } from "antd";
 import { IoAddOutline } from "react-icons/io5";
 import { useQuery } from "@apollo/client";
 import { GET_BRANCHES } from "@/graphql/queries";
-import LocationPage from "./BranchLocation";
+import dynamic from 'next/dynamic';
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+
+// Dynamically import LocationPage with no SSR
+const LocationPage = dynamic(() => import('./BranchLocation'), { ssr: false });
 
 export interface Branch {
   id: string;
@@ -45,10 +48,19 @@ export interface BranchListProps {
 function BranchList() {
   const [activeTab, setActiveTab] = useState<string>("branch");
   const { data, loading, error } = useQuery(GET_BRANCHES);
-  const [filter] = useState('');
+  const [filter] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const [isFilterVisible, setIsFilterVisible] = useState<boolean>(true);
   const pdfRef = useRef<HTMLDivElement>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null;
+  }
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -58,7 +70,9 @@ function BranchList() {
   const toggleFilter = () => setIsFilterVisible((prev) => !prev);
 
   const onRefresh = () => {
-    window.location.reload();
+    if (typeof window !== "undefined") {
+      window.location.reload();
+    }
   };
 
   const filteredBranches = branches.filter(
@@ -73,32 +87,40 @@ function BranchList() {
   );
 
   const printDiv = () => {
-    const iframe = document.getElementById("print_frame") as HTMLIFrameElement | null;
+    if (typeof window === 'undefined') return;
+    
+    const iframe = document.getElementById(
+      "print_frame"
+    ) as HTMLIFrameElement | null;
     const printFrame = iframe?.contentWindow;
     const printableElement = document.getElementById("printableTable");
-  
+
     if (printableElement && printFrame) {
       printFrame.document.body.innerHTML = printableElement.innerHTML;
-      printFrame.focus(); // window.focus биш
+      printFrame.focus();
       printFrame.print();
     } else {
       console.warn("Printable element or print frame not found.");
     }
   };
-  
+
   const handleSavePDF = async () => {
-    const element = pdfRef.current;
-    if (!element) return;
+    if (typeof window === "undefined" || !pdfRef.current) return;
 
-    const canvas = await html2canvas(element);
-    const imgData = canvas.toDataURL("image/png");
+    try {
+      const element = pdfRef.current;
+      const canvas = await html2canvas(element);
+      const imgData = canvas.toDataURL("image/png");
 
-    const pdf = new jsPDF("p", "mm", "a4");
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-    pdf.save("document.pdf");
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("document.pdf");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
   };
 
   // const rowSelection = {
@@ -193,7 +215,12 @@ function BranchList() {
             <h3 className="font-medium">Дэлгүүрийн Нэр</h3>
             <Checkbox.Group
               className="flex flex-col gap-2"
-              options={["M MART ЦАМБАГАРАВ САЛБАР", "M MART ЭЛЕГАНС /МОДНЫ 2/ САЛБАР", "M MART 22-Н ТОВЧОО САЛБАР", "M MART БАГШИЙН ДЭЭД САЛБАР"]}
+              options={[
+                "M MART ЦАМБАГАРАВ САЛБАР",
+                "M MART ЭЛЕГАНС /МОДНЫ 2/ САЛБАР",
+                "M MART 22-Н ТОВЧОО САЛБАР",
+                "M MART БАГШИЙН ДЭЭД САЛБАР",
+              ]}
               onChange={(values) => setSelectedStatus(values as string[])}
             />
           </div>
@@ -202,11 +229,7 @@ function BranchList() {
             <h3 className="font-medium">Бүс</h3>
             <Checkbox.Group
               className="flex flex-col gap-2"
-              options={[
-                "WESTERN",
-                "CENTRAL",
-                "EASTERN",
-              ]}
+              options={["WESTERN", "CENTRAL", "EASTERN"]}
               onChange={() => setSelectedRegion()}
             />
           </div>
@@ -215,7 +238,7 @@ function BranchList() {
             <h3 className="font-medium">Дэлгүүрийн төрөл</h3>
             <Checkbox.Group
               className="flex flex-col gap-2"
-              options={["SUPERMARKET", "NEIGHBOUR","EXPRESS"]}
+              options={["SUPERMARKET", "NEIGHBOUR", "EXPRESS"]}
               onChange={(values) => setSelectedStatus(values as string[])}
             />
           </div>
@@ -308,11 +331,13 @@ function BranchList() {
             <Table
               id="printableTable"
               columns={columns}
-              dataSource={filteredBranches.map(function (branch: { id: unknown; }) {
-                return ({
+              dataSource={filteredBranches.map(function (branch: {
+                id: unknown;
+              }) {
+                return {
                   ...branch,
                   key: branch.id,
-                });
+                };
               })}
               pagination={{
                 pageSize: 4,

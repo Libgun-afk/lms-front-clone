@@ -63,19 +63,77 @@ const GET_USERS = gql`
   }
 `;
 
-// interface UsersListProps {
-//   users: any[];
-// }
+// Define interfaces for the user data
+interface Wallet {
+  walletNumber: string;
+  balance: number;
+  currency: string;
+}
+
+interface FamilyMember {
+  cumId: string;
+  phoneNumber: string;
+  firstName: string;
+  lastName: string;
+  type: string;
+  canSpendLoyalty: boolean;
+  showPurchaseHistory: boolean;
+}
+
+interface Family {
+  id: string;
+  members: FamilyMember[];
+}
+
+interface UserDetail {
+  lastName: string;
+  firstName: string;
+  birthDate: string;
+  email: string;
+  gender: string;
+  kyc: boolean;
+  status: string;
+  phoneNumber: string;
+  userId: string;
+}
+
+interface Group {
+  id: string;
+  name: string;
+}
+
+interface User {
+  cumId: string;
+  uuid: string;
+  phoneNumber: string;
+  loyaltyPercent: number;
+  walletNumber: string;
+  wallet: Wallet;
+  family: Family;
+  detail: UserDetail;
+  status: string;
+  groups: Group[];
+  createdAt: string;
+}
+
+interface UsersResponse {
+  getUsers: {
+    pageNumber: number;
+    pageSize: number;
+    total: number;
+    items: User[];
+  };
+}
 
 const UsersList = () => {
-  const { data, loading, error } = useQuery(GET_USERS);
+  const { data, loading, error } = useQuery<UsersResponse>(GET_USERS);
   const [isFilterVisible, setIsFilterVisible] = useState<boolean>(false);
   const [value, setValue] = useState<[number, number]>([0, 100]);
   const [isDetailsVisible, setIsDetailsVisible] = useState<boolean>(false);
-  const [selectedUser, setSelectedUser] = useState<any | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState<string>("users");
   const handleToggleFilter = () => setIsFilterVisible((prev) => !prev);
-  const handleRowClick = (user: any) => {
+  const handleRowClick = (user: User) => {
     if (selectedUser?.uuid === user.uuid) {
       setSelectedUser(null);
       setIsDetailsVisible(false);
@@ -88,7 +146,7 @@ const UsersList = () => {
   console.log(activeTab);
 
   const printDiv = () => {
-    const printFrame = (window.frames as any)["print_frame"];
+    const printFrame = (window.frames as unknown as { [key: string]: Window })["print_frame"];
     const printableElement = document.getElementById("printableTable");
 
     // Check if the element exists
@@ -135,7 +193,7 @@ const UsersList = () => {
   const showAddModal = () => setIsAddModalOpen(true);
   const handleAddNemeh = () => setIsAddModalOpen(false);
 
-  const columns: TableProps<any>["columns"] = [
+  const columns: TableProps<User>["columns"] = [
     {
       title: "Утасны дугаар",
       dataIndex: "phoneNumber",
@@ -226,7 +284,7 @@ const UsersList = () => {
       key: "orgName",
       render: (_, item) => (
         <>
-          {item.groups?.map((group: any, k: number) => (
+          {item.groups?.map((group: Group, k: number) => (
             <span key={k}>{group?.name}</span>
           ))}
         </>
@@ -252,17 +310,6 @@ const UsersList = () => {
   const onRefresh = () => {
     window.location.reload();
   };
-
-  function handleAnotherToggleFilter(
-    event: React.MouseEvent<HTMLButtonElement>
-  ): void {
-    throw new Error("Function not implemented.");
-  }
-
-
-  function setSelectedRegion(_arg0: string[]): void {
-    throw new Error("Function not implemented.");
-  }
 
   return (
     <div className="flex-1 bg-white  gap-4 p-8">
@@ -448,7 +495,7 @@ const UsersList = () => {
               <Checkbox.Group
                 className="flex flex-col gap-2"
                 options={["Идэвхтэй", "Идэвхгүй"]}
-                onChange={(values) => setSelectedUser(values as string[])}
+                onChange={(values) => setSelectedUser(values as unknown as User)}
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -456,7 +503,10 @@ const UsersList = () => {
               <Checkbox.Group
                 className="flex flex-col gap-2"
                 options={["ID байгаа", "ID байхгүй"]}
-                onChange={(values) => setSelectedRegion(values as string[])}
+                onChange={(values) => {
+                  // Implementation needed
+                  console.log(values);
+                }}
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -465,7 +515,7 @@ const UsersList = () => {
                 className="flex flex-col gap-2"
                 options={["Эрэгтэй", "Эмэгтэй"]}
                 onChange={(values: string[]) =>
-                  setSelectedUser(values as string[])
+                  setSelectedUser(values as unknown as User)
                 }
               />
             </div>
@@ -474,20 +524,20 @@ const UsersList = () => {
               <DatePicker
                 onChange={(date, dateString) =>
                   setSelectedUser(
-                    typeof dateString === "string" ? [dateString] : []
+                    typeof dateString === "string" ? [dateString] as unknown as User : null
                   )
                 }
               />
               <DatePicker
                 onChange={(date, dateString) =>
                   setSelectedUser(
-                    typeof dateString === "string" ? [dateString] : []
+                    typeof dateString === "string" ? [dateString] as unknown as User : null
                   )
                 }
               />
               <Checkbox.Group
                 className="flex flex-col gap-2"
-                onChange={(values) => setSelectedUser(values as string[])}
+                onChange={(values) => setSelectedUser(values as unknown as User)}
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -495,7 +545,7 @@ const UsersList = () => {
               <Checkbox.Group
                 className="flex flex-col gap-2"
                 options={["Байгууллагатай", "Байгууллагагүй"]}
-                onChange={(values) => setSelectedUser(values as string[])}
+                onChange={(values) => setSelectedUser(values as unknown as User)}
               />
             </div>
             <button className="gap-2 flex justify-center items-center bg-[#3051A0] text-white p-2 pl-1 rounded-xl">
@@ -512,12 +562,12 @@ const UsersList = () => {
             <Table
               id="printableTable"
               columns={columns}
-              dataSource={users.map((user: any) => ({
+              dataSource={users.map((user: User) => ({
                 ...user,
                 key: user.uuid,
               }))}
               pagination={{ pageSize: 8, showSizeChanger: false }}
-              rowClassName={(record: any) =>
+              rowClassName={(record: User) =>
                 `cursor-pointer ${selectedUser?.uuid === record.uuid ? "" : ""}`
               }
               onRow={(record) => ({
