@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Checkbox, DatePicker, Slider, Table, TableProps, Tag } from "antd";
 import { useQuery, gql } from "@apollo/client";
 import { IoAddOutline } from "react-icons/io5";
@@ -64,9 +64,9 @@ const GET_USERS = gql`
   }
 `;
 
-interface UsersListProps {
-  users: any[];
-}
+// interface UsersListProps {
+//   users: any[];
+// }
 
 const UsersList = () => {
   const { data, loading, error } = useQuery(GET_USERS);
@@ -149,8 +149,12 @@ const UsersList = () => {
     {
       title: "Хэрэглэгч",
       dataIndex: "loyaltyPercent",
-      key: "loyaltyPercent",
-      render: (loyaltyPercent: string) => <span>{loyaltyPercent}</span>,
+      key: "BE",
+      render: (loyaltyPercent) => (
+        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm">
+          {loyaltyPercent}
+        </div>
+      ),
       width: 100,
     },
     {
@@ -247,11 +251,11 @@ const UsersList = () => {
   const onRefresh = () => {
     window.location.reload();
   };
-  function handleAnotherToggleFilter(event: React.MouseEvent<HTMLButtonElement>): void {
-    throw new Error("Function not implemented.");
-  }
+  // function handleAnotherToggleFilter(event: React.MouseEvent<HTMLButtonElement>): void {
+  //   throw new Error("Function not implemented.");
+  // }
 
-  function setSelectedRegion(arg0: string[]): void {
+  function setSelectedRegion(_arg0: string[]): void {
     throw new Error("Function not implemented.");
   }
 
@@ -436,10 +440,12 @@ const UsersList = () => {
          <Table
           id="printableTable"
           columns={columns}
-          dataSource={users.map((user: any) => ({
-            ...user,
-            key: user.uuid,
-          }))}
+          dataSource={users.map((user: any): any => {
+            return ({
+              ...user,
+              key: user.uuid,
+            });
+          })}
           pagination={{ pageSize: 8, showSizeChanger: false }}
           rowClassName={(record: any) =>
             `cursor-pointer ${selectedUser?.uuid === record.uuid ? "" : ""}`
