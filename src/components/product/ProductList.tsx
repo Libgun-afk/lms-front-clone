@@ -137,7 +137,7 @@ const ProductList: React.FC<ProductListProps> = ({
       key: "promotionProduct",
       align: "center",
 
-      render: (promotionProduct) => <span>{promotionProduct}</span>,
+      render: (promotionProduct) => <span>{promotionProduct?.name || "-"}</span>,
       width: 90,
     },
     {

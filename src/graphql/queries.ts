@@ -51,12 +51,33 @@ export const GET_TAG_LIST = gql`
 export const GET_PRODUCTS = gql`
   query GetProducts {
     getProducts {
+      pageNumber
+      pageSize
+      total
       items {
         id
         name
+        status
         code
         price
+        salePrice
+        salePercent
+        saleStartdate
+        saleEnddate
+        promotionName
+        promotionProduct {
+          code
+          name
+        }
+        promotionStartdate
+        promotionEnddate
         description
+        tags {
+          id
+          name
+          status
+          type
+        }
         images {
           uuid
           originalName
@@ -66,25 +87,10 @@ export const GET_PRODUCTS = gql`
         createdUserId
         createdUserName
         createdAt
-        promotionProduct {
-          name
-        }
-        status
-        tags {
-          name
-        }
-        updatedAt
         updatedUserId
-        salePrice
-        salePercent
-        saleStartdate
-        saleEnddate
-        promotionName
-        promotionStartdate
-        promotionEnddate
         updatedUserName
+        updatedAt
       }
-      total
     }
   }
 `;
@@ -108,7 +114,6 @@ export const GET_FEEDBACKS = gql`
           uuid
           phoneNumber
           loyaltyPercent
-          canSpendLoyalty
           walletNumber
           wallet {
             walletNumber
@@ -174,6 +179,28 @@ export const GET_FEEDBACKS = gql`
   }
 `;
 
+export const GET_EMPLOYEES = gql`
+  query GetEmployeeList {
+    getEmployeeList {
+      empId
+      orgId
+      firstName
+      lastName
+    }
+  }
+`;
+
+export const GET_EMP_ID = gql`
+  query GetEmployeeByEmpId {
+    getEmployeeByEmpId {
+      empId
+      orgId
+      firstName
+      lastName
+    }
+  }
+`;
+
 export const GET_USERS = gql`
   query GetUsers {
     getUsers {
@@ -185,7 +212,6 @@ export const GET_USERS = gql`
         uuid
         phoneNumber
         loyaltyPercent
-        canSpendLoyalty
         walletNumber
         wallet {
           walletNumber
@@ -199,13 +225,21 @@ export const GET_USERS = gql`
             phoneNumber
             firstName
             lastName
+            type
+            canSpendLoyalty
+            showPurchaseHistory
           }
         }
         detail {
-          firstName
           lastName
-          phoneNumber
+          firstName
+          birthDate
           email
+          gender
+          kyc
+          status
+          phoneNumber
+          userId
         }
         status
         groups {
@@ -256,6 +290,15 @@ export const GET_LOG = gql`
         createdAt
         createdEmpId
       }
+    }
+  }
+`;
+
+export const GET_FEEDBACK_STATUSES = gql`
+  query GetFeedbackStatuses {
+    getFeedbackStatuses {
+      value
+      label
     }
   }
 `;

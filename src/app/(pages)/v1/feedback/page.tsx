@@ -29,19 +29,19 @@ const Feedback = () => {
     }
   }, [data]);
 
-  // const handleRefresh = async () => {
-  //   try {
-  //     setRefreshLoading(true);
-  //     const result = await refetch();
-  //     if (result?.data?.getFeedbackList?.items) {
-  //       setFeedbacks(result.data.getFeedbackList.items);
-  //     }
-  //   } catch (err) {
-  //     console.error("Refresh error:", err);
-  //   } finally {
-  //     setRefreshLoading(false);
-  //   }
-  // };
+  const handleRefresh = async () => {
+    try {
+      setRefreshLoading(true);
+      const result = await refetch();
+      if (result?.data?.getFeedbackList?.items) {
+        setFeedbacks(result.data.getFeedbackList.items);
+      }
+    } catch (err) {
+      console.error("Refresh error:", err);
+    } finally {
+      setRefreshLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -57,7 +57,8 @@ const Feedback = () => {
   if (error) {
     return (
       <p className="flex justify-center items-center text-red-500">
-        Error: {error.message}
+        {/* Error:  */}
+        server deer aldaa garsaan bro {error.message}
       </p>
     );
   }
@@ -69,7 +70,7 @@ const Feedback = () => {
           <Spin indicator={<LoadingOutlined style={{ fontSize: 50 }} spin />} />
         </div>
       ) : (
-        <FeedBackList feedbacks={feedbacks} />
+        <FeedBackList feedbacks={feedbacks} onRefresh={handleRefresh} />
       )}
     </div>
   );
