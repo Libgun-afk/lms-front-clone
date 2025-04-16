@@ -1,8 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table, TableProps, Tag } from "antd";
 import FeedbackStatusForm from "./FeedBackStatusForm";
+import { getCookie } from "cookies-next";
+import { decodeToken } from "@/lib/tokenUtils";
+import { useMutation } from "@apollo/client";
+import { UPDATE_FEEDBACK_MUTATION } from "@/graphql/mutation";
+import toast from "react-hot-toast";
+import { fontWeight } from "html2canvas/dist/types/css/property-descriptors/font-weight";
 
 interface Feedback {
   id: string;
@@ -82,14 +88,28 @@ interface Feedback {
 
 interface Props {
   feedbacks: Feedback[];
+  onRefresh?: () => Promise<void>;
 }
 
-const FeedBackList: React.FC<Props> = ({ feedbacks }) => {
+const FeedBackList = ({ feedbacks, onRefresh }: Props) => {
   const [isDetailsVisible, setIsDetailsVisible] = useState<boolean>(false);
   const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(
     null
   );
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<number>(0);
+
+  const [updateFeedback] = useMutation(UPDATE_FEEDBACK_MUTATION);
+
+  useEffect(() => {
+    const token = getCookie("userToken");
+    if (token && typeof token === "string") {
+      const decoded = decodeToken(token);
+      if (decoded && decoded.empId) {
+        setCurrentUserId(Number(decoded.empId));
+      }
+    }
+  }, []);
 
   const filteredFeedbacks = feedbacks.filter(
     (feedback) =>
@@ -120,14 +140,147 @@ const FeedBackList: React.FC<Props> = ({ feedbacks }) => {
     }
   };
 
-  const handleStatusChange = (newStatus: string) => {
-    setSelectedFeedback((prev) =>
-      prev ? { ...prev, status: newStatus } : null
-    );
+  const handleStatusUpdate = async (feedbackId: number, status: string) => {
+    try {
+      await updateFeedback({
+        variables: {
+          feedbackId,
+          resolveInput: {
+            status,
+            resolvedEmpId: currentUserId,
+            priority: selectedFeedback?.priority || "NORMAL",
+            resolutionComment: "",
+          },
+        },
+      });
+      toast.success("Статус амжилттай шинэчлэгдлээ");
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Статус шинэчлэхэд алдаа гарлаа");
+    }
   };
 
-  const onRefresh = () => {
-    console.log("Refreshing...");
+  const handleAssign = async (feedbackId: number, assigneeId: number) => {
+    try {
+      await updateFeedback({
+        variables: {
+          feedbackId,
+          resolveInput: {
+            status: "Хянагдаж байгаа",
+            resolvedEmpId: assigneeId,
+            priority: selectedFeedback?.priority || "NORMAL",
+            resolutionComment: "",
+          },
+        },
+      });
+      toast.success("Ажилтан амжилттай сонгогдлоо");
+    } catch (error) {
+      console.error("Error assigning feedback:", error);
+      toast.error("Ажилтан сонгоход алдаа гарлаа");
+    }
+  };
+
+  const handleStatusChange = async (newStatus: string) => {
+    if (selectedFeedback) {
+      try {
+        await handleStatusUpdate(Number(selectedFeedback.id), newStatus);
+        setSelectedFeedback((prev) =>
+          prev ? { ...prev, status: newStatus } : null
+        );
+        if (onRefresh) {
+          await onRefresh();
+        }
+      } catch (error) {
+        console.error("Error updating status:", error);
+      }
+    }
+  };
+
+  const handleAssigneeChange = async (assigneeId: string) => {
+    if (selectedFeedback) {
+      const numericAssigneeId = Number(assigneeId);
+      if (!isNaN(numericAssigneeId)) {
+        try {
+          await handleAssign(Number(selectedFeedback.id), numericAssigneeId);
+          setSelectedFeedback((prev) =>
+            prev ? { ...prev, assignee: assigneeId } : null
+          );
+          if (onRefresh) {
+            await onRefresh();
+          }
+        } catch (error) {
+          console.error("Error updating assignee:", error);
+        }
+      }
+    }
+  };
+
+  const getStatusDisplay = (feedback: Feedback) => {
+    const isAssignee =
+      currentUserId === parseInt(feedback.assignedEmp?.empId || "0");
+
+    switch (feedback.status.toLowerCase()) {
+      case "resolved":
+      case "Шийдвэрлэсэн":
+        return {
+          text: "Шийдвэрлэсэн",
+          style: {
+            borderRadius: "16px",
+            border: "1px solid #ECFDF3",
+            color: "#039855",
+            backgroundColor: "#ECFDF3",
+            padding: "1px 8px",
+          },
+        };
+      case "in_progress":
+      case "Шийдвэрлэх":
+        if (isAssignee) {
+          return {
+            text: "Шийдвэрлэх",
+            style: {
+              borderRadius: "8px",
+              border: "",
+              color: "#E24C1E",
+              backgroundColor: "#FEF3F2",
+              padding: "4px 8px",
+            },
+          };
+        } else {
+          return {
+            text: "Хүлээгдэж байгаа",
+            style: {
+              border: "1px solid #F0F2F5",
+              borderRadius: "16px",
+              color: "#374151",
+              backgroundColor: "#F0F2F5",
+              padding: "1px 8px",
+            },
+          };
+        }
+      case "pending":
+      case "Шийдвэрлэх":
+        return {
+          text: "Шийдвэрлэх",
+          style: {
+            borderRadius: "16px",
+            border: "1px solid #FEF3F2",
+            color: "#E24C1E",
+            backgroundColor: "#FEF3F2",
+            padding: "1px 8px",
+          },
+        };
+
+      default:
+        return {
+          text: feedback.status,
+          style: {
+            borderRadius: "8px",
+            color: "#374151",
+            backgroundColor: "#F3F4F6",
+            padding: "4px 8px",
+          },
+        };
+    }
   };
 
   const columns: TableProps<Feedback>["columns"] = [
@@ -252,34 +405,11 @@ const FeedBackList: React.FC<Props> = ({ feedbacks }) => {
       dataIndex: "status",
       key: "status",
       align: "center",
-
-      render: (status: string) => {
-        let tagStyle = {};
-        if (status === "Шийдвэрлэсэн") {
-          tagStyle = {
-            borderRadius: "8px",
-            border: "1px solid #D1FAE5",
-            color: "#039855",
-            backgroundColor: "#ECFDF3",
-          };
-        } else if (status === "Шийдвэрлэх") {
-          tagStyle = {
-            borderRadius: "8px",
-            border: "1px solid #FEE2E2",
-            color: "#B91C1C",
-            backgroundColor: "#FEF3F2",
-          };
-        } else if (status === "Хүлээгдэж байгаа") {
-          tagStyle = {
-            borderRadius: "8px",
-            color: "black",
-            backgroundColor: "#F0F2F5",
-          };
-        }
-
+      render: (_: any, record: Feedback) => {
+        const statusDisplay = getStatusDisplay(record);
         return (
-          <Tag style={tagStyle} className="rounded-full">
-            {status}
+          <Tag style={statusDisplay.style} className="rounded-full">
+            {statusDisplay.text}
           </Tag>
         );
       },
@@ -289,9 +419,8 @@ const FeedBackList: React.FC<Props> = ({ feedbacks }) => {
       title: "Хариуцсан ажилтан",
       key: "responsible",
       align: "center",
-
       render: (_: any, record: Feedback) => (
-        <span>
+        <span className="text-[#4F46E5] font-medium">
           {record.assignedEmp
             ? `${record.assignedEmp.lastName} ${record.assignedEmp.firstName}`
             : "-"}
@@ -304,9 +433,8 @@ const FeedBackList: React.FC<Props> = ({ feedbacks }) => {
       dataIndex: "resolvedAt",
       key: "resolvedAt",
       align: "center",
-
       render: (resolvedAt: string) => (
-        <span>
+        <span className="text-[#039855] font-medium">
           {resolvedAt ? new Date(resolvedAt).toLocaleDateString() : "-"}
         </span>
       ),
@@ -332,18 +460,14 @@ const FeedBackList: React.FC<Props> = ({ feedbacks }) => {
           </div>
           <div className="flex gap-2">
             <button
-              onClick={() => onRefresh()}
+              onClick={() => onRefresh?.()}
               className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
               <img src="/image.png" alt="" className="w-4 h-4" />
             </button>
-            <button
-              // onClick={toggleFilter}
-              className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
+            <button className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
               <img src="/image copy.png" alt="" className="w-4 h-4" />
             </button>
-            <button
-              // onClick={toggleFilter}
-              className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] w-9 rounded-xl border-2 border-gray-300 justify-center items-center gap-2 p-2">
+            <button className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] w-9 rounded-xl border-2 border-gray-300 justify-center items-center gap-2 p-2">
               <img src="/image copy 2.png" alt="" className="w-[14px] h-4" />
             </button>
             <button
@@ -441,18 +565,23 @@ const FeedBackList: React.FC<Props> = ({ feedbacks }) => {
               </div>
               <FeedbackStatusForm
                 selectedFeedback={{
-                  status: "",
-                  assignee: "",
+                  id: parseInt(selectedFeedback.id),
+                  status: selectedFeedback.status,
+                  assignee: selectedFeedback.assignedEmp?.empId || "",
+                  priority: selectedFeedback.priority || "NORMAL",
                 }}
-                handleStatusChange={function (value: string): void {
-                  throw new Error("Function not implemented.");
+                handleStatusChange={handleStatusChange}
+                handleAssigneeChange={handleAssigneeChange}
+                handlePriorityChange={(value) => {
+                  setSelectedFeedback((prev) =>
+                    prev ? { ...prev, priority: value } : null
+                  );
                 }}
-                handleAssigneeChange={function (value: string): void {
-                  throw new Error("Function not implemented.");
+                handleSubmit={() => {}}
+                onSuccess={() => {
+                  if (onRefresh) onRefresh();
                 }}
-                handleSubmit={function (action: string): void {
-                  throw new Error("Function not implemented.");
-                }}
+                currentUserId={currentUserId}
               />
             </div>
           </div>
