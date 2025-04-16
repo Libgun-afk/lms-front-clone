@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Checkbox, DatePicker, Slider, Table, TableProps, Tag } from "antd";
 import { useQuery, gql } from "@apollo/client";
 import { IoAddOutline } from "react-icons/io5";
@@ -146,8 +146,12 @@ const UsersList = () => {
     {
       title: "Хэрэглэгч",
       dataIndex: "loyaltyPercent",
-      key: "loyaltyPercent",
-      render: (loyaltyPercent: string) => <span>{loyaltyPercent}</span>,
+      key: "BE",
+      render: (loyaltyPercent) => (
+        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm">
+          {loyaltyPercent}
+        </div>
+      ),
       width: 100,
     },
     {
@@ -248,13 +252,15 @@ const UsersList = () => {
   const onRefresh = () => {
     window.location.reload();
   };
+
   function handleAnotherToggleFilter(
     event: React.MouseEvent<HTMLButtonElement>
   ): void {
     throw new Error("Function not implemented.");
   }
 
-  function setSelectedRegion(arg0: string[]): void {
+
+  function setSelectedRegion(_arg0: string[]): void {
     throw new Error("Function not implemented.");
   }
 
@@ -514,6 +520,7 @@ const UsersList = () => {
             />
           </div>
         </div>
+
         {isDetailsVisible && selectedUser && (
           <div className="w-[400px] flex flex-col gap-5 p-4 rounded-xl bg-white shadow-md border-gray-200">
             {/* Header хэсэг */}

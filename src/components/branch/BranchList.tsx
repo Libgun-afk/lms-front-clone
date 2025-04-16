@@ -45,8 +45,7 @@ export interface BranchListProps {
 function BranchList() {
   const [activeTab, setActiveTab] = useState<string>("branch");
   const { data, loading, error } = useQuery(GET_BRANCHES);
-  const [filter, setFilter] = useState("");
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [filter] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const [isFilterVisible, setIsFilterVisible] = useState<boolean>(true);
   const pdfRef = useRef<HTMLDivElement>(null);
@@ -100,10 +99,10 @@ function BranchList() {
     pdf.save("document.pdf");
   };
 
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: (keys: React.Key[]) => setSelectedRowKeys(keys),
-  };
+  // const rowSelection = {
+  //   selectedRowKeys,
+  //   onChange: (keys: React.Key[]) => setSelectedRowKeys(keys),
+  // };
 
   const columns: TableProps<(typeof branches)[0]>["columns"] = [
     {
@@ -166,11 +165,11 @@ function BranchList() {
     throw new Error("Function not implemented.");
   }
 
-  function handleSubmit(event: FormEvent<HTMLDivElement>): void {
+  function handleSubmit(_event: FormEvent<HTMLDivElement>): void {
     throw new Error("Function not implemented.");
   }
 
-  function setSelectedRegion(arg0: string[]): void {
+  function setSelectedRegion(_arg0: string[]): void {
     throw new Error("Function not implemented.");
   }
 
@@ -186,33 +185,32 @@ function BranchList() {
           <h2 className="font-semibold">Шүүлтүүр</h2>
           {/* Төрөл */}
           <div className="flex flex-col gap-2">
-            <h3 className="font-medium">Харилцагчийн салбар</h3>
+            <h3 className="font-medium">Дэлгүүрийн Нэр</h3>
             <Checkbox.Group
               className="flex flex-col gap-2"
-              options={["Үйлдвэрлэл", "Үйлчилгээ", "Худалдаа", "Санхүүгийн"]}
+              options={["M MART ЦАМБАГАРАВ САЛБАР", "M MART ЭЛЕГАНС /МОДНЫ 2/ САЛБАР", "M MART 22-Н ТОВЧОО САЛБАР", "M MART БАГШИЙН ДЭЭД САЛБАР"]}
               onChange={(values) => setSelectedStatus(values as string[])}
             />
           </div>
           {/* Бүс */}
           <div className="flex flex-col gap-2">
-            <h3 className="font-medium">Харилцагчийн бүлэг</h3>
+            <h3 className="font-medium">Бүс</h3>
             <Checkbox.Group
               className="flex flex-col gap-2"
               options={[
-                "Хангамж нийлүүлэгч",
-                "Нийлүүлэгч",
-                "Гүйцэтгэгч компани",
-                "Логистик болон тээвэрлэгч",
+                "WESTERN",
+                "CENTRAL",
+                "EASTERN",
               ]}
               onChange={(values) => setSelectedRegion(values as string[])}
             />
           </div>
           {/* Тусгай зөвшөөрөл */}
           <div className="flex flex-col gap-2">
-            <h3 className="font-medium">НӨАТ төлөгч эсэх</h3>
+            <h3 className="font-medium">Дэлгүүрийн төрөл</h3>
             <Checkbox.Group
               className="flex flex-col gap-2"
-              options={["Тийм", "Үгүй"]}
+              options={["SUPERMARKET", "NEIGHBOUR","EXPRESS"]}
               onChange={(values) => setSelectedStatus(values as string[])}
             />
           </div>
@@ -300,10 +298,12 @@ function BranchList() {
             <Table
               id="printableTable"
               columns={columns}
-              dataSource={filteredBranches.map((branch: { id: any }) => ({
-                ...branch,
-                key: branch.id,
-              }))}
+              dataSource={filteredBranches.map(function (branch: { id: any; }) {
+                return ({
+                  ...branch,
+                  key: branch.id,
+                });
+              })}
               pagination={{
                 pageSize: 4,
                 showSizeChanger: false,

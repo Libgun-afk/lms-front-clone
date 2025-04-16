@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons';
 import { useState } from 'react';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const user = {
   name: 'М. Нэргүй',
@@ -43,7 +43,7 @@ const transactions = [
 
 export default function UserProfileCard(props: any) {
   
-  const {isOpen: openProps, isCancel: cancelProps} = props;
+  // const {isOpen: openProps, isCancel: cancelProps} = props;
 
   const [isOpen, setIsOpen] = useState(false);
   const [phone, setPhone] = useState("");
@@ -59,7 +59,7 @@ export default function UserProfileCard(props: any) {
   };
   const [isCancel, setIsCancel] = useState(false);
   const [familyId, setFamilyId] = useState("97174");
-  const [members, setMembers] = useState([
+  const [members] = useState([
     "8080 5050",
     "8064 8570",
     "8040 9077",
