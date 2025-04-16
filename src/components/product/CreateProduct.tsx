@@ -307,6 +307,7 @@ const CreateProduct = ({ onClose }: { onClose: () => void }) => {
             <button
               type="submit"
               className="bg-[#0A2D75] text-white flex justify-center items-center rounded w-[102px] h-9 hover:bg-blue-800 transition font-semibold gap-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/image copy 5.png"
                 className="w-[14px] h-4"

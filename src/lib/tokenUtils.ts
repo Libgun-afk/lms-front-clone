@@ -3,7 +3,7 @@ import axios from "axios";
 
 interface DecodedToken {
   exp: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export const decodeToken = (token: string): DecodedToken | null => {

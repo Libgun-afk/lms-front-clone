@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { Table, Tag, Image, Checkbox } from "antd";
 import type { TableProps } from "antd";
 import { IoAddOutline } from "react-icons/io5";
@@ -73,17 +73,19 @@ function BranchList() {
   );
 
   const printDiv = () => {
-    const printFrame = (window.frames as any)["print_frame"];
+    const iframe = document.getElementById("print_frame") as HTMLIFrameElement | null;
+    const printFrame = iframe?.contentWindow;
     const printableElement = document.getElementById("printableTable");
-
-    // Check if the element exists
-    if (printableElement) {
-      const printableContent = printableElement.innerHTML;
-      printFrame.document.body.innerHTML = printableContent;
-      printFrame.window.focus();
-      printFrame.window.print();
+  
+    if (printableElement && printFrame) {
+      printFrame.document.body.innerHTML = printableElement.innerHTML;
+      printFrame.focus(); // window.focus биш
+      printFrame.print();
+    } else {
+      console.warn("Printable element or print frame not found.");
     }
   };
+  
   const handleSavePDF = async () => {
     const element = pdfRef.current;
     if (!element) return;
@@ -162,20 +164,23 @@ function BranchList() {
   ];
 
   function toggleDetail(): void {
-    throw new Error("Function not implemented.");
+    // console.log("Тайлбар дэлгэрэнгүй байна.");
+    // throw new Error("Function not implemented.");
   }
 
-  function handleSubmit(_event: FormEvent<HTMLDivElement>): void {
-    throw new Error("Function not implemented.");
+  function handleSubmit(): void {
+    // console.log("Тайлбар дэлгэрэнгүй байна.");
+    // throw new Error("Function not implemented.");
   }
 
-  function setSelectedRegion(_arg0: string[]): void {
-    throw new Error("Function not implemented.");
+  function setSelectedRegion(): void {
+    // throw new Error("Function not implemented.");
   }
 
   return (
     <div className="flex w-full gap-3 p-8" onSubmit={handleSubmit}>
       <iframe
+        id="print_frame"
         name="print_frame"
         style={{ display: "none" }}
         title="print_frame"
@@ -202,7 +207,7 @@ function BranchList() {
                 "CENTRAL",
                 "EASTERN",
               ]}
-              onChange={(values) => setSelectedRegion(values as string[])}
+              onChange={() => setSelectedRegion()}
             />
           </div>
           {/* Тусгай зөвшөөрөл */}
@@ -264,14 +269,17 @@ function BranchList() {
             <button
               onClick={() => onRefresh()}
               className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/image.png" alt="" className="w-4 h-4" />
             </button>
             <button className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/image copy.png" alt="" className="w-4 h-4" />
             </button>
             <button
               onClick={toggleFilter}
               className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/image copy 2.png" alt="" className="w-[14px] h-4" />
             </button>
             <div className="p-0.3">
@@ -282,12 +290,14 @@ function BranchList() {
               <button
                 onClick={handleSavePDF}
                 className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] w-9 rounded-xl border-2 border-gray-300 justify-center items-center gap-2 p-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/image copy 7.png" alt="" className="w-[14px] h-4" />
               </button>
             </div>
             <button
               onClick={printDiv}
               className="h-[36px] gap-2 flex items-center justify-center bg-white rounded-xl border px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/image copy 8.png" alt="" className="w-[14px] h-4" />
               Хэвлэх
             </button>
@@ -298,7 +308,7 @@ function BranchList() {
             <Table
               id="printableTable"
               columns={columns}
-              dataSource={filteredBranches.map(function (branch: { id: any; }) {
+              dataSource={filteredBranches.map(function (branch: { id: unknown; }) {
                 return ({
                   ...branch,
                   key: branch.id,
@@ -310,7 +320,7 @@ function BranchList() {
               }}
               className="w-full"
               rowClassName={() => " cursor-pointer"}
-              onRow={(record) => ({
+              onRow={() => ({
                 onClick: () => toggleDetail(),
               })}
               style={{
