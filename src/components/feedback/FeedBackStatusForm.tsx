@@ -1,99 +1,196 @@
-import { Select, Input } from "antd";
-import React from "react";
-import { MdDone } from "react-icons/md";
-import { BiTransfer } from "react-icons/bi";
+import { useState, useEffect } from "react";
+import { Select, Input, Button, Form } from "antd";
+import { useMutation, useQuery } from "@apollo/client";
+import { UPDATE_FEEDBACK_MUTATION } from "@/graphql/mutation";
+import { GET_EMPLOYEES } from "@/graphql/queries";
+import toast from "react-hot-toast";
 
-interface FeedbackStatusFormProps {
+interface Props {
   selectedFeedback: {
+    id: number;
     status: string;
     assignee: string;
+    priority: string;
   };
-  handleStatusChange: (value: string) => void;
-  handleAssigneeChange: (value: string) => void;
-  handleSubmit: (action: string) => void;
+  handleStatusChange: (status: string) => Promise<void>;
+  handleAssigneeChange: (assigneeId: string) => Promise<void>;
+  handlePriorityChange: (value: string) => void;
+  handleSubmit: () => void;
+  onSuccess: () => void;
+  currentUserId: number;
 }
 
-const FeedbackStatusForm: React.FC<FeedbackStatusFormProps> = ({
+interface Employee {
+  empId: number;
+  orgId: number;
+  firstName: string | null;
+  lastName: string | null;
+}
+
+const FeedbackStatusForm: React.FC<Props> = ({
   selectedFeedback,
   handleStatusChange,
   handleAssigneeChange,
+  handlePriorityChange,
   handleSubmit,
+  onSuccess,
+  currentUserId,
 }) => {
+  const [resolutionComment, setResolutionComment] = useState<string>("");
+  const [form] = Form.useForm();
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>(selectedFeedback.assignee);
+
+  const {
+    data: employeeData,
+    loading: employeeLoading,
+    error: employeeError,
+  } = useQuery(GET_EMPLOYEES);
+
+  const [updateFeedback] = useMutation(UPDATE_FEEDBACK_MUTATION);
+
+  const employees = employeeData?.getEmployeeList || [];
+  
+  // Check if the selected employee is the current user
+  const isCurrentUserSelected = selectedEmployeeId === currentUserId.toString();
+
+  // Update selectedEmployeeId when selectedFeedback changes
+  useEffect(() => {
+    setSelectedEmployeeId(selectedFeedback.assignee);
+  }, [selectedFeedback.assignee]);
+
+  const handleEmployeeChange = (value: string) => {
+    setSelectedEmployeeId(value);
+  };
+
+  const handleResolve = async () => {
+    try {
+      await updateFeedback({
+        variables: {
+          feedbackId: selectedFeedback.id,
+          resolveInput: {
+            resolvedEmpId: currentUserId,
+            priority: selectedFeedback.priority || "NORMAL",
+            resolutionComment: resolutionComment
+          },
+        },
+      });
+      toast.success("Амжилттай шийдвэрлэлээ!");
+      handleStatusChange("Шийдэгдсэн");
+      onSuccess();
+    } catch (error) {
+      toast.error("Алдаа гарлаа!");
+      console.error("Error resolving feedback:", error);
+    }
+  };
+
+  const handleAssign = async () => {
+    try {
+      await updateFeedback({
+        variables: {
+          feedbackId: selectedFeedback.id,
+          resolveInput: {
+            resolvedEmpId: parseInt(selectedEmployeeId),
+            priority: selectedFeedback.priority || "NORMAL",
+            resolutionComment: resolutionComment
+          },
+        },
+      });
+      
+      toast.success("Амжилттай шилжүүллээ!");
+      handleStatusChange("Хянагдаж байгаа");
+      onSuccess();
+    } catch (error) {
+      toast.error("Алдаа гарлаа!");
+      console.error("Error assigning feedback:", error);
+    }
+  };
+
+  if (employeeLoading) {
+    return <div>Ажилтны мэдээлэл ачаалж байна...</div>;
+  }
+
+  if (employeeError) {
+    console.error("Employee loading error:", employeeError);
+    return <div>Ажилтны мэдээлэл ачаалахад алдаа гарлаа</div>;
+  }
+
+  // Create employee options with proper display names
+  const employeeOptions = [
+    { 
+      value: currentUserId.toString(), 
+      label: `Өөрөө (${currentUserId})` 
+    },
+    ...employees.map((emp: Employee) => {
+      // Skip the current user as they're already in the list
+      if (emp.empId === currentUserId) return null;
+      
+      // Create display name based on available data
+      let displayName = `Ажилтан #${emp.empId}`;
+      if (emp.firstName && emp.lastName) {
+        displayName = `${emp.lastName} ${emp.firstName}`;
+      } else if (emp.firstName) {
+        displayName = emp.firstName;
+      } else if (emp.lastName) {
+        displayName = emp.lastName;
+      }
+      
+      return {
+        value: emp.empId.toString(),
+        label: displayName
+      };
+    }).filter(Boolean) // Remove null entries
+  ];
+
   return (
-    <div className="border-t-2 border-[#F0F2F5] p-4 flex flex-col gap-4 bg-white">
-      {/* Төлөв */}
-      <div>
-        <label className="text-[#374151] text-sm font-medium">Төлөв</label>
+    <Form form={form} layout="vertical" className="p-4">
+      <Form.Item label="Төлөв">
+        <div>{selectedFeedback.status}</div>
+      </Form.Item>
+
+      <Form.Item label="Ажилтан">
         <Select
-          value={selectedFeedback.status}
-          onChange={handleStatusChange}
-          className="w-full mt-1"
+          value={selectedEmployeeId}
+          onChange={handleEmployeeChange}
+          loading={employeeLoading}
+          placeholder="Ажилтан сонгох"
+          options={employeeOptions}
+        />
+      </Form.Item>
+
+      <Form.Item label="Эрэмбэ">
+        <Select
+          value={selectedFeedback.priority}
+          onChange={handlePriorityChange}
+          placeholder="Эрэмбэ сонгох"
           options={[
-            { label: "Шинэ", value: "Шинэ" },
-            { label: "Хянагдаж байгаа", value: "Хянагдаж байгаа" },
-            { label: "Шийдэгдсэн", value: "Шийдэгдсэн" },
-            { label: "Татгалзсан", value: "Татгалзсан" },
+            { value: "LOW", label: "LOW" },
+            { value: "NORMAL", label: "NORMAL" },
+            { value: "HIGH", label: "HIGH" }
           ]}
         />
-      </div>
+      </Form.Item>
 
-      {/* Шийдвэрлэх ажилтан */}
-      <div>
-        <label className="text-[#374151] text-sm font-medium">
-          Шийдвэрлэх ажилтан
-        </label>
-        <Select
-          value={selectedFeedback.assignee}
-          onChange={handleAssigneeChange}
-          className="w-full mt-1"
-          options={[
-            { label: "Battulga E.", value: "Battulga E." },
-            { label: "Batdorj J.", value: "Batdorj J." },
-          ]}
-        />
-      </div>
-
-      {/* Шийдвэрийн дэлгэрэнгүй */}
-      <div>
-        <label className="text-[#374151] text-sm font-medium">
-          Шийдвэрийн дэлгэрэнгүй
-        </label>
+      <Form.Item label="Шийдвэрийн дэлгэрэнгүй">
         <Input.TextArea
-          rows={4}
+          value={resolutionComment}
+          onChange={(e) => setResolutionComment(e.target.value)}
           placeholder="Тайлбар оруулах"
-          className="mt-1"
+          rows={4}
         />
-      </div>
+      </Form.Item>
 
-      {selectedFeedback.status !== "Шийдэгдсэн" && (
-        <div className="flex flex-col gap-2 mt-4">
-          {selectedFeedback.status === "Хүлээгдэж байгаа" && (
-            <button
-              onClick={() => handleSubmit("changeStatus")}
-              className="bg-[#0A2D75] text-white rounded-xl py-2 w-full justify-center items-center flex gap-2">
-              <BiTransfer className="w-[14px] h-4" />
-              Төлөв солих
-            </button>
-          )}
-
-          {selectedFeedback.status === "Хянагдаж байгаа" && (
-            <button
-              onClick={() => handleSubmit("assignTo")}
-              className="bg-[#0A2D75] text-white rounded-xl py-2 w-full justify-center items-center flex gap-2">
-              <BiTransfer className="w-[14px] h-4" />
-              Ажилтанд шилжүүлэх
-            </button>
-          )}
-
-          <button
-            onClick={() => handleSubmit("resolve")}
-            className="bg-[#0A2D75] text-white rounded-xl py-2 w-full justify-center items-center flex gap-2">
-            <MdDone className="w-[14px] h-4" />
+      <div className="flex flex-col gap-2">
+        {isCurrentUserSelected ? (
+          <Button type="primary" onClick={handleResolve}>
             Шийдвэрлэх
-          </button>
-        </div>
-      )}
-    </div>
+          </Button>
+        ) : (
+          <Button type="primary" onClick={handleAssign}>
+            Ажилтанд шилжүүлэх
+          </Button>
+        )}
+      </div>
+    </Form>
   );
 };
 

@@ -19,7 +19,9 @@ const SideBar = () => {
   const router = usePathname();
   const routerRedirect = useRouter();
   const [sidebarShrink, setSidebarShrink] = useAtom(sidebarShrinkAtom);
-  const [userInfo, setUserInfo] = useState<{ name?: string; role?: string }>({});
+  const [userInfo, setUserInfo] = useState<{ name?: string; role?: string }>(
+    {}
+  );
 
   useEffect(() => {
     const token = getCookie("userToken");
@@ -28,7 +30,7 @@ const SideBar = () => {
       if (decoded) {
         setUserInfo({
           name: decoded.name,
-          role: decoded.role
+          role: decoded.role,
         });
       }
     }
@@ -54,7 +56,13 @@ const SideBar = () => {
   return (
     <div className={`account-sidebar ${sidebarShrink ? "shrink" : ""}`}>
       <div className="logo-img">
-        <Image src="/logo.png" width={76} height={49} alt="LMS" priority />
+        <Image
+          src="/logo white.png"
+          width={76}
+          height={49}
+          alt="LMS"
+          priority
+        />
         {!sidebarShrink && <p>LMS</p>}
       </div>
       <ul className="account-sidebar_menu">

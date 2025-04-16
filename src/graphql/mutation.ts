@@ -38,3 +38,84 @@ export const CREATE_PRODUCT_MUTATION = gql`
     }
   }
 `;
+export const UPDATE_FEEDBACK_MUTATION = gql`
+  mutation UpdateFeedback(
+    $feedbackId: Int
+    $resolveInput: FeedbackResolveInput
+  ) {
+    updateFeedback(feedbackId: $feedbackId, resolveInput: $resolveInput) {
+      id
+      type
+      status
+      priority
+      date
+      title
+      description
+      user {
+        cumId
+        uuid
+        phoneNumber
+        loyaltyPercent
+        walletNumber
+        wallet {
+          walletNumber
+          balance
+          currency
+        }
+        family {
+          id
+          members {
+            cumId
+            phoneNumber
+            firstName
+            lastName
+          }
+        }
+        detail {
+          lastName
+          firstName
+          birthDate
+          email
+          gender
+          kyc
+          status
+          phoneNumber
+          userId
+        }
+        status
+        groups {
+          id
+          name
+        }
+        createdAt
+      }
+      image {
+        uuid
+        originalName
+        url
+        mimetype
+      }
+      resolutionComment
+      resolvedDate
+      resolvedEmp {
+        empId
+        orgId
+        firstName
+        lastName
+      }
+      assignedEmp {
+        empId
+        orgId
+        firstName
+        lastName
+      }
+      assignedAt
+      assignerEmp {
+        empId
+        orgId
+        firstName
+        lastName
+      }
+    }
+  }
+`;
