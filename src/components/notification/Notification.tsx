@@ -192,6 +192,7 @@ const NotificationList = ({ notifications }: NotificationListProps) => {
             <button
               onClick={handleOpenModal}
               className="h-[36px] gap-2 flex items-center justify-center bg-[#3051A0] hover:bg-[#203974] rounded-xl text-white px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/image copy 3.png" alt="" className="w-[14px] h-4" />
               Мэдэгдэл илгээх
             </button>
