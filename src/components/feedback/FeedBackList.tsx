@@ -8,7 +8,6 @@ import { decodeToken } from "@/lib/tokenUtils";
 import { useMutation } from "@apollo/client";
 import { UPDATE_FEEDBACK_MUTATION } from "@/graphql/mutation";
 import toast from "react-hot-toast";
-import { fontWeight } from "html2canvas/dist/types/css/property-descriptors/font-weight";
 
 interface Feedback {
   id: string;
@@ -96,7 +95,7 @@ const FeedBackList = ({ feedbacks, onRefresh }: Props) => {
   const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(
     null
   );
-  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const [selectedStatus] = useState<string[]>([]);
   const [currentUserId, setCurrentUserId] = useState<number>(0);
 
   const [updateFeedback] = useMutation(UPDATE_FEEDBACK_MUTATION);
@@ -117,14 +116,24 @@ const FeedBackList = ({ feedbacks, onRefresh }: Props) => {
   );
 
   const printDiv = () => {
-    const printFrame = (window.frames as any)["print_frame"];
     const printableElement = document.getElementById("printableTable");
 
     if (printableElement) {
       const printableContent = printableElement.innerHTML;
-      printFrame.document.body.innerHTML = printableContent;
-      printFrame.window.focus();
-      printFrame.window.print();
+      const printFrame = document.createElement("iframe");
+      printFrame.style.position = "absolute";
+      printFrame.style.top = "-10000px";
+      document.body.appendChild(printFrame);
+
+      const printDocument =
+        printFrame.contentDocument || printFrame.contentWindow?.document;
+      if (printDocument) {
+        printDocument.body.innerHTML = printableContent;
+        printFrame.contentWindow?.focus();
+        printFrame.contentWindow?.print();
+      }
+
+      document.body.removeChild(printFrame);
     } else {
       console.error("Element with id 'printableTable' not found.");
     }
@@ -288,7 +297,7 @@ const FeedBackList = ({ feedbacks, onRefresh }: Props) => {
       title: "Зураг",
       key: "image",
       align: "center",
-      render: (_: any, record: Feedback) =>
+      render: (_: unknown, record: Feedback) =>
         record.image ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -364,7 +373,7 @@ const FeedBackList = ({ feedbacks, onRefresh }: Props) => {
       title: "Хэрэглэгч",
       key: "user",
       align: "center",
-      render: (_: any, record: Feedback) => (
+      render: (_: unknown, record: Feedback) => (
         <span>
           {record.user?.detail?.lastName} {record.user?.detail?.firstName}
         </span>
@@ -408,7 +417,7 @@ const FeedBackList = ({ feedbacks, onRefresh }: Props) => {
       dataIndex: "status",
       key: "status",
       align: "center",
-      render: (_: any, record: Feedback) => {
+      render: (_: unknown, record: Feedback) => {
         const statusDisplay = getStatusDisplay(record);
         return (
           <Tag style={statusDisplay.style} className="rounded-full">
@@ -422,7 +431,7 @@ const FeedBackList = ({ feedbacks, onRefresh }: Props) => {
       title: "Хариуцсан ажилтан",
       key: "responsible",
       align: "center",
-      render: (_: any, record: Feedback) => (
+      render: (_: unknown, record: Feedback) => (
         <span className="text-[#4F46E5] font-medium">
           {record.assignedEmp
             ? `${record.assignedEmp.lastName} ${record.assignedEmp.firstName}`
@@ -469,7 +478,7 @@ const FeedBackList = ({ feedbacks, onRefresh }: Props) => {
               <img src="/image.png" alt="" className="w-4 h-4" />
             </button>
             <button className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}             
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/image copy.png" alt="" className="w-4 h-4" />
             </button>
             <button className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] w-9 rounded-xl border-2 border-gray-300 justify-center items-center gap-2 p-2">

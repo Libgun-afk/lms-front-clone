@@ -15,8 +15,49 @@ import { CREATE_PRODUCT_MUTATION } from "@/graphql/mutation";
 import { LoadingOutlined } from "@ant-design/icons";
 import Dragger from "antd/es/upload/Dragger";
 import toast from "react-hot-toast";
+import type { Dayjs } from "dayjs";
 
 const allowedFileTypes = ["image/png", "image/jpeg", "image/jpg"];
+
+interface Tag {
+  id: string;
+  name: string;
+}
+
+interface FormValues {
+  code: string;
+  name: string;
+  price: string;
+  description?: string;
+  salePrice?: string;
+  salePercent?: string;
+  saleStartdate?: Dayjs;
+  saleEnddate?: Dayjs;
+  promotionName?: string;
+  promotionProduct?: string;
+  promotionStartdate?: Dayjs;
+  promotionEnddate?: Dayjs;
+}
+
+interface ProductInput {
+  code: string;
+  name: string;
+  price: string;
+  description: string;
+  tags: string[];
+  sale?: {
+    salePrice: string | null;
+    salePercent: number | null;
+    saleStartdate: string | null;
+    saleEnddate: string | null;
+  };
+  promotion?: {
+    promotionName: string | null;
+    promotionProduct: string | null;
+    promotionStartdate: string | null;
+    promotionEnddate: string | null;
+  };
+}
 
 const CreateProduct = ({ onClose }: { onClose: () => void }) => {
   const { loading, error, data } = useQuery(GET_TAG_LIST, {
@@ -28,33 +69,32 @@ const CreateProduct = ({ onClose }: { onClose: () => void }) => {
 
   const [form] = Form.useForm();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   const handleTagChange = (values: string[]) => {
     setSelectedTags(Array.from(new Set(values)));
     form.setFieldsValue({ tags: values });
   };
 
-  const [fileList, setFileList] = useState<any>([]);
-
   const uploadProps = {
     name: "file",
     multiple: true,
-    beforeUpload(file: any) {
+    beforeUpload(file: File) {
       if (!allowedFileTypes.includes(file.type)) {
         message.error(`${file.name} зөвшөөрөгдөөгүй файл байна!`);
         return Upload.LIST_IGNORE;
       }
       return true;
     },
-    onChange(info: any) {
-      let newFileList = info.fileList.filter((file: any) =>
-        allowedFileTypes.includes(file.type)
+    onChange(info: { fileList: UploadFile[] }) {
+      const newFileList = info.fileList.filter((file: UploadFile) =>
+        allowedFileTypes.includes(file.type || "")
       );
       setFileList(newFileList);
     },
-    onRemove(file: any) {
+    onRemove(file: UploadFile) {
       setFileList((prev: UploadFile[]) =>
-        prev.filter((f) => f.uid !== file.uuid)
+        prev.filter((f) => f.uid !== file.uid)
       );
     },
   };
@@ -63,18 +103,16 @@ const CreateProduct = ({ onClose }: { onClose: () => void }) => {
 
   const tags = data?.getTagList?.items || [];
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: FormValues) => {
     try {
-      const input: any = {
+      const input: ProductInput = {
         code: values.code,
         name: values.name,
         price: String(parseFloat(values.price)),
         description: values.description || "",
         tags: selectedTags
           .map((tag) =>
-            tags.find(
-              (originalTag: { name: string }) => originalTag.name === tag
-            )
+            tags.find((originalTag: Tag) => originalTag.name === tag)
           )
           .filter(Boolean)
           .map(({ id }) => id),
@@ -122,9 +160,11 @@ const CreateProduct = ({ onClose }: { onClose: () => void }) => {
       toast.success(`"${data.createProduct}" амжилттай нэмэгдлээ!`);
 
       if (onClose) onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Product create алдаа:", error);
-      toast.error("Бараа бүртгэхэд алдаа гарлаа: " + error.message);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      toast.error("Бараа бүртгэхэд алдаа гарлаа: " + errorMessage);
     }
   };
   if (loading) {
@@ -172,7 +212,12 @@ const CreateProduct = ({ onClose }: { onClose: () => void }) => {
                 placeholder="Төрөл сонгох"
                 value={selectedTags}
                 onChange={handleTagChange}>
-                {data?.getTagList?.items?.map((tag: any) => (
+                {/* {data?.getTagList?.items?.map((tag: any) => (
+                  <Select.Option key={tag.id} value={tag.name}>
+                    {tag.name}
+                  </Select.Option>
+                ))} */}
+                {tags.map((tag: Tag) => (
                   <Select.Option key={tag.id} value={tag.name}>
                     {tag.name}
                   </Select.Option>
@@ -291,8 +336,8 @@ const CreateProduct = ({ onClose }: { onClose: () => void }) => {
                 placeholder="Орц, найруулга гэх мэт тайлбарласан дэлгэрэнгүй мэдээллийг энд бичнэ."
               />
             </Form.Item>
-            <Form.Item label="Зураг оруулах" className="mb-4">
-              <Dragger {...uploadProps}>
+            <Form.Item name="images" label="Зураг оруулах" className="mb-4">
+              <Dragger {...uploadProps} fileList={fileList}>
                 <p className="ant-upload-drag-icon"></p>
                 <p className="ant-upload-text">
                   {" "}

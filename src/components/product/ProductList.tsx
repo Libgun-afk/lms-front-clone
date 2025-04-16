@@ -59,9 +59,9 @@ const ProductList: React.FC<ProductListProps> = ({
 
   console.log(tagList);
 
-  const [filter, setFilter] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [filter] = useState("");
+  const [selectedStatus] = useState<string[]>([]);
+  const [selectedTags] = useState<string[]>([]);
   const [isFilterVisible, setIsFilterVisible] = useState<boolean>(true);
   const toggleFilter = () => setIsFilterVisible((prev) => !prev);
 
@@ -79,16 +79,18 @@ const ProductList: React.FC<ProductListProps> = ({
   });
 
   const printDiv = () => {
-    const printFrame = (window.frames as any)["print_frame"];
+    const printFrame = document.querySelector(
+      'iframe[name="print_frame"]'
+    ) as HTMLIFrameElement | null;
     const printableElement = document.getElementById("printableTable");
 
-    if (printableElement) {
+    if (printableElement && printFrame?.contentWindow) {
       const printableContent = printableElement.innerHTML;
-      printFrame.document.body.innerHTML = printableContent;
-      printFrame.window.focus();
-      printFrame.window.print();
+      printFrame.contentWindow.document.body.innerHTML = printableContent;
+      printFrame.contentWindow.focus();
+      printFrame.contentWindow.print();
     } else {
-      console.error("Element with id 'printableTable' not found.");
+      console.error("Print frame or printable element not found.");
     }
   };
 
@@ -137,7 +139,9 @@ const ProductList: React.FC<ProductListProps> = ({
       key: "promotionProduct",
       align: "center",
 
-      render: (promotionProduct) => <span>{promotionProduct?.name || "-"}</span>,
+      render: (promotionProduct) => (
+        <span>{promotionProduct?.name || "-"}</span>
+      ),
       width: 90,
     },
     {
@@ -305,7 +309,13 @@ const ProductList: React.FC<ProductListProps> = ({
               <img src="/image copy 3.png" alt="" className="w-[14px] h-4" />
               Бараа бүртгэх
             </button>
-
+            {isFilterVisible && (
+              <div className="filter-panel">
+                <button onClick={() => setIsFilterVisible((prev) => !prev)}>
+                  Toggle Filter
+                </button>
+              </div>
+            )}
             {isModalOpen && (
               <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                 <div className="bg-white p-6 rounded-lg shadow-lg z-50">
@@ -353,7 +363,7 @@ const ProductList: React.FC<ProductListProps> = ({
                 ✖
               </button>
             </div>
-
+            <button onClick={toggleDetail}>Toggle Detail</button>
             <ProductDetail product={selectedProduct} />
           </div>
         </div>
