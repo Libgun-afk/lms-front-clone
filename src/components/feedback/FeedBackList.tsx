@@ -290,7 +290,10 @@ const FeedBackList = ({ feedbacks, onRefresh }: Props) => {
       align: "center",
       render: (_: any, record: Feedback) =>
         record.image ? (
-          <img src={record.image.url} alt="feedback" width={50} />
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={record.image.url} alt="feedback" width={50} />
+          </>
         ) : (
           "-"
         ),
@@ -462,17 +465,21 @@ const FeedBackList = ({ feedbacks, onRefresh }: Props) => {
             <button
               onClick={() => onRefresh?.()}
               className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/image.png" alt="" className="w-4 h-4" />
             </button>
             <button className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}             
               <img src="/image copy.png" alt="" className="w-4 h-4" />
             </button>
             <button className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] w-9 rounded-xl border-2 border-gray-300 justify-center items-center gap-2 p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/image copy 2.png" alt="" className="w-[14px] h-4" />
             </button>
             <button
               onClick={printDiv}
               className="h-[36px] gap-2 flex items-center justify-center bg-white rounded-xl border px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/image copy 8.png" alt="" className="w-[14px] h-4" />
               Хэвлэх
             </button>
@@ -502,6 +509,7 @@ const FeedBackList = ({ feedbacks, onRefresh }: Props) => {
         {isDetailsVisible && selectedFeedback && (
           <div className="flex flex-col ">
             <div className="h-[60px] flex items-center px-4 gap-5 rounded-t-xl bg-white border-b-2 border-[#F0F2F5]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={selectedFeedback.image?.url}
                 alt="feedback"

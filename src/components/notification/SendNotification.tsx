@@ -132,6 +132,7 @@ const SendNotification = ({ onClose }: { onClose: () => void }) => {
             </div>
 
             <div className="relative flex flex-col justify-center items-center gap-4 h-[692px] w-[330px] ">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={images[currentImage]}
                 alt={`Slide ${currentImage + 1}`}
@@ -143,6 +144,7 @@ const SendNotification = ({ onClose }: { onClose: () => void }) => {
                   <button
                     onClick={handlePrev}
                     className="absolute left-7  translate-x-[-50%] bg-[#3051A0] h-9 w-9 text-white rounded-xl p-4">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/image copy 14.png" alt="" />
                   </button>
                 )}
@@ -151,6 +153,7 @@ const SendNotification = ({ onClose }: { onClose: () => void }) => {
                   <button
                     onClick={handleNext}
                     className="absolute right-6 translate-x-[50%] bg-[#3051A0] h-9 w-9 text-white rounded-xl p-4">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/image copy 13.png" alt="" />
                   </button>
                 )}
@@ -165,6 +168,7 @@ const SendNotification = ({ onClose }: { onClose: () => void }) => {
             type="button"
             className="bg-[#0A2D75] text-white flex justify-center items-center rounded w-[148px] h-9 hover:bg- transition font-semibold gap-2">
             <div className="text-sm font-medium">Зарлал илгээх</div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/image copy 10.png"
               className="w-[14px] h-4"

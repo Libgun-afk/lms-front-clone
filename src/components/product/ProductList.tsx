@@ -274,21 +274,25 @@ const ProductList: React.FC<ProductListProps> = ({
           <button
             onClick={() => onRefresh()}
             className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/image.png" alt="" className="w-4 h-4" />
           </button>
           <button
             onClick={toggleFilter}
             className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/image copy.png" alt="" className="w-4 h-4" />
           </button>
           <button
             onClick={toggleFilter}
             className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] w-9 rounded-xl border-2 border-gray-300 justify-center items-center gap-2 p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/image copy 2.png" alt="" className="w-[14px] h-4" />
           </button>
           <button
             onClick={printDiv}
             className="h-[36px] gap-2 flex items-center justify-center bg-white rounded-xl border px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/image copy 8.png" alt="" className="w-[14px] h-4" />
             Хэвлэх
           </button>
@@ -297,6 +301,7 @@ const ProductList: React.FC<ProductListProps> = ({
             <button
               onClick={handleOpenModal}
               className="h-[36px] gap-2 flex items-center justify-center bg-[#3051A0] hover:bg-[#203974] rounded-xl text-white px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/image copy 3.png" alt="" className="w-[14px] h-4" />
               Бараа бүртгэх
             </button>

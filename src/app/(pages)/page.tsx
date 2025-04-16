@@ -42,7 +42,7 @@ const LoginPage = () => {
       });
       setRememberData(parsed);
     }
-  }, []);
+  }, [form, setRememberData]);
 
   const onFinish = async (values: LoginType) => {
     setLoading(true);
@@ -101,7 +101,7 @@ const LoginPage = () => {
         setLoading(false);
         message.error("Хэрэглэгчийн нэвтрэх нэр нууц үг буруу байна");
       }
-    } catch (error) {
+    } catch {
       setLoading(false);
       message.error("Алдаа гарлаа дахин оролдоно уу");
     }

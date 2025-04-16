@@ -30,9 +30,9 @@ interface Employee {
 const FeedbackStatusForm: React.FC<Props> = ({
   selectedFeedback,
   handleStatusChange,
-  handleAssigneeChange,
+  // handleAssigneeChange,
   handlePriorityChange,
-  handleSubmit,
+  // handleSubmit,
   onSuccess,
   currentUserId,
 }) => {

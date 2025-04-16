@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getCookie, setCookie } from "cookies-next";
+import { getCookie } from "cookies-next";
 import { shouldRefreshToken, refreshAccessToken } from "./tokenUtils";
 
 const instance = axios.create({

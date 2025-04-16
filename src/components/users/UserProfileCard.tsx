@@ -41,7 +41,7 @@ const transactions = [
 ];
 
 
-export default function UserProfileCard(props: any) {
+export default function UserProfileCard() {
   
   // const {isOpen: openProps, isCancel: cancelProps} = props;
 

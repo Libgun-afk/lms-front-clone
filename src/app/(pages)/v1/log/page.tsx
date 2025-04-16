@@ -2,13 +2,12 @@
 
 import { useQuery } from "@apollo/client";
 import { GET_LOG } from "@/graphql/queries";
-import { Collapse, Spin, Table, Tag, Typography } from "antd";
+import { Spin, Table, Tag, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import moment from "moment";
 import { LoadingOutlined } from "@ant-design/icons";
 
 const { Paragraph } = Typography;
-const { Panel } = Collapse;
 
 interface LogItem {
   id: string;
@@ -24,18 +23,18 @@ interface LogItem {
 }
 
 // 📌 JSON parse хийх function-ийг глобалд нэг удаа тодорхойлно
-function safeJsonParse(jsonStr: string): React.ReactNode {
-  try {
-    const parsed = JSON.parse(jsonStr);
-    return (
-      <pre className="whitespace-pre-wrap">
-        {JSON.stringify(parsed, null, 2)}
-      </pre>
-    );
-  } catch (e) {
-    return <span className="text-red-500">Invalid JSON</span>;
-  }
-}
+// function safeJsonParse(jsonStr: string): React.ReactNode {
+//   try {
+//     const parsed = JSON.parse(jsonStr);
+//     return (
+//       <pre className="whitespace-pre-wrap">
+//         {JSON.stringify(parsed, null, 2)}
+//       </pre>
+//     );
+//   } catch (e) {
+//     return <span className="text-red-500">Invalid JSON</span>;
+//   }
+// }
 
 const LogList = () => {
   const { data, loading, error } = useQuery(GET_LOG);

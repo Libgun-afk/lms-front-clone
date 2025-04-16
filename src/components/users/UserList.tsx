@@ -283,14 +283,17 @@ const UsersList = () => {
           <button
             onClick={() => onRefresh()}
             className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/image.png" alt="" className="w-4 h-4" />
           </button>
           <button className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] rounded-xl w-9 border-2 border-gray-300 justify-center items-center gap-2 p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/image copy.png" alt="" className="w-4 h-4" />
           </button>
           <button
             onClick={handleToggleFilter}
             className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] w-9 rounded-xl border-2 border-gray-300 justify-center items-center gap-2 p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/image copy 2.png" alt="" className="w-[14px] h-4" />
           </button>
           <div className="p-0.3">
@@ -301,6 +304,7 @@ const UsersList = () => {
             <button
               onClick={handleSavePDF}
               className="transition-all duration-300 ease-in-out transform hover:scale-105 flex h-[36px] w-9 rounded-xl border-2 border-gray-300 justify-center items-center gap-2 p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/image copy 7.png" alt="" className="w-[14px] h-4" />
             </button>
           </div>
@@ -308,12 +312,14 @@ const UsersList = () => {
             <button
               onClick={printDiv}
               className="h-[36px] gap-2 flex items-center justify-center bg-white rounded-xl border px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/image copy 8.png" alt="" className="w-[14px] h-4" />
               Хэвлэх
             </button>
             <button
               onClick={showModal}
               className="h-[36px] gap-2 flex items-center justify-center bg-white rounded-xl border  px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="" alt="" className="w-[14px] h-4" />
               Оноо хасах
             </button>
@@ -366,6 +372,7 @@ const UsersList = () => {
             <button
               onClick={showAddModal}
               className="h-[36px] gap-2 flex items-center justify-center bg-white rounded-xl border  px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/image copy 3.png" alt="" className="w-[14px] h-4" />
               Оноо нэмэх
             </button>
@@ -526,6 +533,7 @@ const UsersList = () => {
             {/* Header хэсэг */}
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={selectedUser?.phoneNumber || ""}
                   alt="icon"
@@ -575,7 +583,7 @@ const UsersList = () => {
             </div>
 
             <div className="mt-4">
-              {activeTab === "users" && <UserProfileCard isCancel />}
+              {activeTab === "users" && <UserProfileCard />}
             </div>
           </div>
         )}
